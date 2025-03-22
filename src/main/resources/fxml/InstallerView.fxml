@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox alignment="CENTER" spacing="10" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tsh.slt.installer.controller.InstallerController">
+    <padding>
+        <Insets bottom="20" left="20" right="20" top="20" />
+    </padding>
+
+    <!-- 설치 경로 선택 -->
+    <Label text="설치 경로:" />
+
+    <HBox spacing="10" alignment="CENTER">
+        <TextField fx:id="installPathField" prefWidth="350" />
+        <Button fx:id="browseButton" text="찾아보기..." />
+    </HBox>
+
+    <!-- 옵션 -->
+    <CheckBox fx:id="createShortcutCheckbox" text="바탕 화면에 바로가기 만들기" />
+
+    <!-- 구분선 -->
+    <Separator />
+
+    <!-- 진행 상황 -->
+    <ProgressBar fx:id="progressBar" prefWidth="400" progress="0.0" />
+
+    <!-- 상태 표시 -->
+    <Label fx:id="statusLabel" />
+
+    <!-- 버튼 -->
+    <HBox spacing="10" alignment="CENTER">
+        <Button fx:id="installButton" text="설치" prefWidth="100" />
+        <Button fx:id="closeButton" text="닫기" prefWidth="100" />
+    </HBox>
+</VBox>
