@@ -8,6 +8,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
+import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
@@ -18,33 +19,29 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import com.tsh.slt.installer.codes.desings.ScreenSize;
+import com.tsh.slt.installer.code.desings.ScreenSize;
 
 public class LoginController extends BaseController {
 
-    @FXML
-    private TextField emailField;
+    @FXML private TextField emailField;
+    @FXML private PasswordField passwordField;
+    @FXML private Hyperlink signInLink;
+    @FXML private Button loginButton;
+    @FXML private Button closeButton;
+    @FXML private Pane rootPane;
+    @FXML private Label titleLabel;
+    @FXML private Label subtitleLabel;
+    @FXML private Label signupInfoLabel;
 
-    @FXML
-    private PasswordField passwordField;
-
-    @FXML
-    private Hyperlink signInLink;
-
-    @FXML
-    private Button loginButton;
-
-    @FXML
-    private Button closeButton; // 닫기 버튼 추가
-
-    @FXML
-    private Pane rootPane; // 최상위 컨테이너
-
-    private static final String SIGN_UP_URL = "https://www.tsh.com/signup"; // 회원가입 페이지 URL 설정
+    private static final String SIGN_UP_URL = "https://www.tsh.com/signup";
 
     @FXML
     private void initialize() {
-        // 기존 초기화 코드
+        // 로그인 화면임을 표시
+        isLoginScreen = true;
+
+        // 스타일 적용
+        applyStyles();
 
         // 닫기 버튼 이벤트 핸들러 등록
         if (closeButton != null) {
@@ -56,9 +53,28 @@ public class LoginController extends BaseController {
     }
 
     @Override
-    protected void initializeCommon(Parent root) {
-        // 창 드래그 기능 활성화
-        enableWindowDrag(root);
+    protected void applyStyles() {
+        // 버튼 스타일 적용
+        styleButtons(new Button[]{loginButton}, new Button[]{closeButton});
+
+        // 텍스트 필드 스타일 적용
+        styleTextFields(new TextField[]{emailField});
+
+        // 패스워드 필드 스타일 적용
+        stylePasswordFields(new PasswordField[]{passwordField});
+
+        // 레이블 스타일 적용
+        styleLabels(
+                new Label[]{titleLabel},           // 헤더 레이블
+                new Label[]{subtitleLabel},        // 서브헤더 레이블
+                new Label[]{signupInfoLabel}       // 일반 레이블
+        );
+
+        // 하이퍼링크 스타일 적용
+        styleHyperlinks(new Hyperlink[]{signInLink});
+
+        // 컨테이너 스타일 적용
+        styleContainers(rootPane, null);
     }
 
     @FXML
@@ -81,11 +97,8 @@ public class LoginController extends BaseController {
         boolean loginSuccess = performLogin(email, password);
 
         if (loginSuccess) {
-            // 로그인 성공 시 다음 화면으로 이동하거나 필요한 작업 수행
-            showAlert(Alert.AlertType.INFORMATION, "로그인 성공", "환영합니다!");
-
-            // 로그인 성공 후 메인 화면으로 이동
-            loadMainScreen();
+            // 로그인 성공 시 제품 선택 화면으로 이동
+            loadProductSelectScreen();
         } else {
             showAlert(Alert.AlertType.ERROR, "로그인 실패", "이메일 또는 비밀번호가 올바르지 않습니다.");
         }
@@ -123,11 +136,23 @@ public class LoginController extends BaseController {
     }
 
     /**
-     * 메인 화면으로 이동하는 메서드
+     * 제품 선택 화면으로 이동하는 메서드
      */
-    private void loadMainScreen() {
+    private void loadProductSelectScreen() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/InstallerView.fxml"));
+            // 클래스 로더를 사용하여 확실한 리소스 경로 지정
+            String fxmlPath = "fxml/ProductSelect.fxml";
+            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(fxmlPath));
+
+            if (loader.getLocation() == null) {
+                // 경로를 찾을 수 없는 경우 다른 방법으로 시도
+                loader = new FXMLLoader(getClass().getResource("/fxml/ProductSelect.fxml"));
+
+                if (loader.getLocation() == null) {
+                    throw new IOException("ProductSelect.fxml 파일을 찾을 수 없습니다.");
+                }
+            }
+
             Parent root = loader.load();
             Scene scene = new Scene(root, ScreenSize.WIDTH, ScreenSize.HEIGHT);
 
@@ -135,11 +160,13 @@ public class LoginController extends BaseController {
             currentStage.setScene(scene);
             currentStage.centerOnScreen();
 
-            // 필요한 경우 컨트롤러에 데이터 전달
-            InstallerController controller = loader.getController();
+            // 제품 선택 컨트롤러에 사용자 이메일 전달 및 이전 화면이 로그인 화면임을 설정
+            ProductSelectController controller = loader.getController();
             controller.setUserEmail(emailField.getText());
+            controller.setPreviousIsLoginScreen(true); // 현재 화면은 로그인 화면이므로 true 전달
         } catch (IOException e) {
-            showAlert(Alert.AlertType.ERROR, "오류", "메인 화면을 로드할 수 없습니다: " + e.getMessage());
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "오류", "제품 선택 화면을 로드할 수 없습니다: " + e.getMessage());
         }
     }
 }

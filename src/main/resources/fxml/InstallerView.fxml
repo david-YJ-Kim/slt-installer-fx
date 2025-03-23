@@ -4,34 +4,40 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox alignment="CENTER" spacing="10" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tsh.slt.installer.controller.InstallerController">
-    <padding>
-        <Insets bottom="20" left="20" right="20" top="20" />
-    </padding>
+<AnchorPane fx:id="rootPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.tsh.slt.installer.controller.InstallerController">
 
-    <!-- 설치 경로 선택 -->
-    <Label text="설치 경로:" />
+    <VBox alignment="CENTER" spacing="10" AnchorPane.topAnchor="0.0"
+          AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+          AnchorPane.rightAnchor="0.0">
+        <padding>
+            <Insets bottom="20" left="20" right="20" top="20" />
+        </padding>
 
-    <HBox spacing="10" alignment="CENTER">
-        <TextField fx:id="installPathField" prefWidth="350" />
-        <Button fx:id="browseButton" text="찾아보기..." />
-    </HBox>
+        <!-- 설치 경로 선택 -->
+        <Label fx:id="pathLabel" text="설치 경로:" />
 
-    <!-- 옵션 -->
-    <CheckBox fx:id="createShortcutCheckbox" text="바탕 화면에 바로가기 만들기" />
+        <HBox spacing="10" alignment="CENTER">
+            <TextField fx:id="installPathField" />
+            <Button fx:id="browseButton" text="찾아보기..." />
+        </HBox>
 
-    <!-- 구분선 -->
-    <Separator />
+        <!-- 옵션 -->
+        <CheckBox fx:id="createShortcutCheckbox" text="바탕 화면에 바로가기 만들기" />
 
-    <!-- 진행 상황 -->
-    <ProgressBar fx:id="progressBar" prefWidth="400" progress="0.0" />
+        <!-- 구분선 -->
+        <Separator />
 
-    <!-- 상태 표시 -->
-    <Label fx:id="statusLabel" />
+        <!-- 진행 상황 -->
+        <ProgressBar fx:id="progressBar" progress="0.0" />
 
-    <!-- 버튼 -->
-    <HBox spacing="10" alignment="CENTER">
-        <Button fx:id="installButton" text="설치" prefWidth="100" />
-        <Button fx:id="closeButton" text="닫기" prefWidth="100" />
-    </HBox>
-</VBox>
+        <!-- 상태 표시 -->
+        <Label fx:id="statusLabel" />
+
+        <!-- 버튼 -->
+        <HBox spacing="10" alignment="CENTER">
+            <Button fx:id="installButton" text="설치" />
+            <Button fx:id="closeButton" text="닫기" />
+        </HBox>
+    </VBox>
+</AnchorPane>

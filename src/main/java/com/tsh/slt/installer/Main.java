@@ -1,6 +1,6 @@
 package com.tsh.slt.installer;
 
-import com.tsh.slt.installer.codes.desings.ScreenSize;
+import com.tsh.slt.installer.code.desings.ScreenSize;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -45,17 +45,5 @@ public class Main extends Application {
      */
     private static void initializeFirebase() {
         // Firebase SDK 초기화 코드 (필요 시 구현)
-        /*
-        try {
-            FileInputStream serviceAccount = new FileInputStream("path/to/serviceAccountKey.json");
-            FirebaseOptions options = FirebaseOptions.builder()
-                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                    .setDatabaseUrl("https://your-project-id.firebaseio.com")
-                    .build();
-            FirebaseApp.initializeApp(options);
-        } catch (IOException e) {
-            System.err.println("Firebase 초기화 오류: " + e.getMessage());
-        }
-        */
     }
 }

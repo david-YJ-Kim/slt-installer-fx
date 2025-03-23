@@ -40,6 +40,13 @@
             <artifactId>jna-platform</artifactId>
             <version>5.12.1</version>
         </dependency>
+
+        <!-- SVG 라이브러리 의존성 -->
+        <dependency>
+            <groupId>org.jfxtras</groupId>
+            <artifactId>jfxtras-labs</artifactId>
+            <version>9.0-r1</version>
+        </dependency>
     </dependencies>
 
     <build>

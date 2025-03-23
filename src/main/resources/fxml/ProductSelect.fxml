@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<AnchorPane fx:id="rootPane" xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.tsh.slt.installer.controller.ProductSelectController"
+            prefHeight="500.0" prefWidth="600.0">
+
+    <VBox alignment="CENTER" spacing="40.0" AnchorPane.topAnchor="0.0"
+          AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+          AnchorPane.rightAnchor="0.0">
+
+        <Label fx:id="titleLabel" text="Please Select Your Product" />
+
+        <!-- 환경 선택 콤보박스 -->
+        <ComboBox fx:id="environmentComboBox" />
+
+        <!-- 빈 공간 추가 -->
+        <Region VBox.vgrow="ALWAYS" />
+
+        <!-- 버튼 영역 -->
+        <HBox alignment="CENTER_RIGHT" spacing="20.0">
+            <Button fx:id="cancelButton" text="Cancel" />
+            <Button fx:id="installButton" text="Install" />
+
+            <padding>
+                <Insets right="40.0" bottom="20.0" />
+            </padding>
+        </HBox>
+    </VBox>
+</AnchorPane>

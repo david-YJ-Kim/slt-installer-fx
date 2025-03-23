@@ -1,4 +1,4 @@
-package com.tsh.slt.installer.codes;
+package com.tsh.slt.installer.code;
 
 public class FxmlFileConstants {
 
