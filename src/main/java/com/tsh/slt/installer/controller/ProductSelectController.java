@@ -39,6 +39,7 @@ public class ProductSelectController extends BaseController {
         ));
         environmentComboBox.setValue("Window"); // 기본값 설정
 
+
         // 버튼 이벤트 처리
         installButton.setOnAction(this::handleInstall);
 

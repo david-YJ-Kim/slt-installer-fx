@@ -401,37 +401,63 @@ public class HeaderComponent {
      */
     private boolean loadIcons() {
         try {
-            // 리소스 경로를 절대 경로로 수정
-            boolean backSuccess = setIconFromResource(backButton, "/icons/back-icon.svg");
-            boolean closeSuccess = setIconFromResource(closeButton, "/icons/close-icon.svg");
+            // 리소스 경로를 수정 - 클래스로더를 통해 명확한 경로 지정
+            String backIconPath = "/icons/back-icon.svg";
+            String closeIconPath = "/icons/close-icon.svg";
 
-            // 둘 중 하나라도 실패하면 false 반환
-            boolean success = backSuccess && closeSuccess;
+            // 콘솔에 경로 확인 로그 추가
+            System.out.println("아이콘 로드 시도: " + backIconPath + ", " + closeIconPath);
 
-            if (success) {
-                // 아이콘이 보이지 않는 문제 해결을 위해 부가 처리
+            InputStream backStream = getClass().getResourceAsStream(backIconPath);
+            InputStream closeStream = getClass().getResourceAsStream(closeIconPath);
+
+            // 스트림이 null인 경우 대체 경로 시도
+            if (backStream == null) {
+                backStream = getClass().getClassLoader().getResourceAsStream("icons/back-icon.svg");
+                System.out.println("대체 경로 시도 (back): icons/back-icon.svg");
+            }
+            if (closeStream == null) {
+                closeStream = getClass().getClassLoader().getResourceAsStream("icons/close-icon.svg");
+                System.out.println("대체 경로 시도 (close): icons/close-icon.svg");
+            }
+
+            boolean success = false;
+
+            if (backStream != null && closeStream != null) {
+                backButton.setImage(new Image(backStream));
+                closeButton.setImage(new Image(closeStream));
+
+                // 이미지 로드 후 제대로 표시되도록 설정
+                backButton.setFitWidth(20);
+                backButton.setFitHeight(20);
+                backButton.setPreserveRatio(true);
                 backButton.setVisible(true);
+
+                closeButton.setFitWidth(20);
+                closeButton.setFitHeight(20);
+                closeButton.setPreserveRatio(true);
                 closeButton.setVisible(true);
 
-                // 아이콘이 화면에 표시되는지 확인
-                System.out.println("백 버튼 크기: " + backButton.getFitWidth() + "x" + backButton.getFitHeight());
-                System.out.println("클로즈 버튼 크기: " + closeButton.getFitWidth() + "x" + closeButton.getFitHeight());
+                backStream.close();
+                closeStream.close();
 
-                // 부모 확인
-                if (backButton.getParent() == null) {
-                    System.err.println("백 버튼의 부모가 없습니다!");
-                } else {
-                    System.out.println("백 버튼의 부모: " + backButton.getParent().getClass().getName());
-                }
-
-                return true;
+                success = true;
+                System.out.println("아이콘 로드 성공!");
             } else {
-                System.err.println("일부 아이콘을 로드하지 못했습니다.");
-                return false;
+                System.err.println("아이콘 스트림 로드 실패: back=" + (backStream != null) + ", close=" + (closeStream != null));
             }
+
+            if (!success) {
+                // 아이콘 로드 실패 시 명시적으로 대체 텍스트 아이콘 생성
+                createTextBasedIcons();
+            }
+
+            return success;
         } catch (Exception e) {
             System.err.println("아이콘을 로드할 수 없습니다: " + e.getMessage());
             e.printStackTrace();
+            // 예외 발생 시 대체 텍스트 아이콘 생성
+            createTextBasedIcons();
             return false;
         }
     }

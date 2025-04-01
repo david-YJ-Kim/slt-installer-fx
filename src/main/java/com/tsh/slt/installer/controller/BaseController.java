@@ -96,6 +96,29 @@ public abstract class BaseController {
             // 뒤로가기 가능 여부 - 이전 화면이 로그인 화면이면 뒤로가기 불가능
             boolean canGoBack = !previousIsLoginScreen;
 
+            // VBox인 경우
+            if (rootPane instanceof VBox) {
+                VBox vbox = (VBox) rootPane;
+
+                // 첫 번째 요소로 빈 공간(여백) 추가
+                Region headerSpace = new Region();
+                headerSpace.setPrefHeight(80); // 헤더 높이 + 여유 공간
+                headerSpace.setMinHeight(40);
+                vbox.getChildren().add(0, headerSpace);
+            }
+            // AnchorPane인 경우
+            else if (rootPane instanceof AnchorPane) {
+                // AnchorPane의 경우, 다른 컨텐츠의 top anchor 값을 조정
+                // 이미 헤더가 추가되기 전에 처리
+                for (Node child : rootPane.getChildren()) {
+                    // 모든 노드의 topAnchor 값 조정 (특정 노드 타입 체크로 변경)
+                    Object topAnchor = AnchorPane.getTopAnchor(child);
+                    if (topAnchor != null) {
+                        AnchorPane.setTopAnchor(child, (Double)topAnchor + 40);
+                    }
+                }
+            }
+
             // 헤더 컴포넌트 추가 및 뒤로가기 동작 설정
             headerComponent = HeaderComponent.addToPane(rootPane, this::navigateBack, canGoBack);
 

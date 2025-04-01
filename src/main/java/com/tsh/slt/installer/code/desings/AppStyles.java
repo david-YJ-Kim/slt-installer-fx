@@ -21,7 +21,8 @@ public class AppStyles {
 
     // 헤더 관련 색상 및 속성
     public static final String HEADER_BACKGROUND_COLOR = "rgba(44, 62, 80, 0.9)"; // 약간 불투명하게
-    public static final String HEADER_HEIGHT = "30px";
+//    public static final String HEADER_BACKGROUND_COLOR = BACKGROUND_COLOR; // 약간 불투명하게
+    public static final String HEADER_HEIGHT = "50px";
     public static final String HEADER_BORDER_RADIUS = "0 0 5px 5px";
     public static final String HEADER_BOX_SHADOW = "0 2px 5px rgba(0, 0, 0, 0.2)";
 

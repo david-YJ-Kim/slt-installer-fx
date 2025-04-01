@@ -1,5 +1,6 @@
 package com.tsh.slt.installer.controller;
 
+import com.tsh.slt.installer.code.styles.LoginStyles;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -11,7 +12,9 @@ import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.awt.Desktop;
@@ -54,28 +57,43 @@ public class LoginController extends BaseController {
 
     @Override
     protected void applyStyles() {
+        // 전용 스타일 클래스를 사용하여 스타일 적용
+        LoginStyles.applyRootContainerStyle(rootPane);
+
+        // 메인 VBox 컨테이너 찾기 (rootPane의 첫 번째 자식이라고 가정)
+        if (rootPane.getChildren().size() > 0 && rootPane.getChildren().get(0) instanceof VBox) {
+            VBox mainContainer = (VBox) rootPane.getChildren().get(0);
+            LoginStyles.applyMainContainerStyle(mainContainer);
+        }
+
+        // 제목과 부제목 스타일 적용
+        LoginStyles.applyTitleStyle(titleLabel);
+        LoginStyles.applySubtitleStyle(subtitleLabel);
+
+        // 입력 필드 스타일 적용
+        LoginStyles.applyInputFieldsStyle(emailField, passwordField);
+
+        // 회원가입 관련 컨테이너 찾기
+        for (javafx.scene.Node node : rootPane.lookupAll(".hbox")) {
+            if (node instanceof HBox && ((HBox) node).getChildren().contains(signInLink)) {
+                LoginStyles.applySignupContainerStyle((HBox) node, signupInfoLabel, signInLink);
+                break;
+            }
+        }
+
         // 버튼 스타일 적용
-        styleButtons(new Button[]{loginButton}, new Button[]{closeButton});
+        LoginStyles.applyLoginButtonStyle(loginButton);
+        LoginStyles.applyCloseButtonStyle(closeButton);
 
-        // 텍스트 필드 스타일 적용
-        styleTextFields(new TextField[]{emailField});
-
-        // 패스워드 필드 스타일 적용
-        stylePasswordFields(new PasswordField[]{passwordField});
-
-        // 레이블 스타일 적용
-        styleLabels(
-                new Label[]{titleLabel},           // 헤더 레이블
-                new Label[]{subtitleLabel},        // 서브헤더 레이블
-                new Label[]{signupInfoLabel}       // 일반 레이블
-        );
-
-        // 하이퍼링크 스타일 적용
-        styleHyperlinks(new Hyperlink[]{signInLink});
-
-        // 컨테이너 스타일 적용
-        styleContainers(rootPane, null);
+        // 버튼 컨테이너 찾기
+        for (javafx.scene.Node node : rootPane.lookupAll(".hbox")) {
+            if (node instanceof HBox && ((HBox) node).getChildren().contains(loginButton)) {
+                LoginStyles.applyButtonContainerStyle((HBox) node);
+                break;
+            }
+        }
     }
+
 
     @FXML
     private void handleClose(ActionEvent event) {
@@ -121,7 +139,8 @@ public class LoginController extends BaseController {
      */
     private boolean performLogin(String email, String password) {
         // 테스트용 로직 (실제 애플리케이션에서는 제거할 것)
-        return email.equals("david@tsh.com") && password.length() > 0;
+//        return email.equals("david@tsh.com") && password.length() > 0;
+        return true;
     }
 
     /**

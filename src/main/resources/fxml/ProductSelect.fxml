@@ -12,6 +12,10 @@
     <VBox alignment="CENTER" spacing="40.0" AnchorPane.topAnchor="0.0"
           AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
           AnchorPane.rightAnchor="0.0">
+        <!-- 패딩 값 조정 - 상단(top) 값을 늘림 -->
+        <padding>
+            <Insets top="60" right="20" bottom="20" left="20" />
+        </padding>
 
         <Label fx:id="titleLabel" text="Please Select Your Product" />
 
