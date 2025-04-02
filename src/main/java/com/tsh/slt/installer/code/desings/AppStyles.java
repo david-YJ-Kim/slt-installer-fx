@@ -166,8 +166,8 @@ public class AppStyles {
                 "-fx-font-size: " + NORMAL_FONT_SIZE + "px;" +
                         "-fx-background-color: white;" +
                         "-fx-border-color: #dddddd;" +
-                        "-fx-border-width: 1px;" +
-                        "-fx-border-radius: 4px;" +
+                        "-fx-border-width: 3px;" +
+                        "-fx-border-radius: 6px;" +
                         "-fx-background-radius: 4px;" +
                         "-fx-min-width: 300px;"
         );

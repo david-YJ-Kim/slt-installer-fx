@@ -1,5 +1,6 @@
 package com.tsh.slt.installer.controller;
 
+import com.tsh.slt.installer.code.FxmlFileConstants;
 import com.tsh.slt.installer.code.desings.ScreenSize;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
@@ -84,10 +85,10 @@ public class ProductSelectController extends BaseController {
         }
 
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("fxml/Login.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(FxmlFileConstants.LOGIN_FXML));
 
             if (loader.getLocation() == null) {
-                loader = new FXMLLoader(getClass().getResource("/fxml/Login.fxml"));
+                loader = new FXMLLoader(getClass().getResource("/".concat(FxmlFileConstants.LOGIN_FXML)));
 
                 if (loader.getLocation() == null) {
                     throw new IOException("Login.fxml 파일을 찾을 수 없습니다.");
@@ -215,11 +216,11 @@ public class ProductSelectController extends BaseController {
      */
     private void loadInstallerScreen(File installerFile) {
         try {
-            String fxmlPath = "fxml/InstallerView.fxml";
+            String fxmlPath = FxmlFileConstants.INSTALLER_VIEW_FXML;
             FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(fxmlPath));
 
             if (loader.getLocation() == null) {
-                loader = new FXMLLoader(getClass().getResource("/fxml/InstallerView.fxml"));
+                loader = new FXMLLoader(getClass().getResource(FxmlFileConstants.INSTALLER_VIEW_FXML));
 
                 if (loader.getLocation() == null) {
                     throw new IOException("InstallerView.fxml 파일을 찾을 수 없습니다.");

@@ -1,5 +1,6 @@
 package com.tsh.slt.installer.controller;
 
+import com.tsh.slt.installer.code.FxmlFileConstants;
 import com.tsh.slt.installer.code.styles.LoginStyles;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -41,7 +42,7 @@ public class LoginController extends BaseController {
     @FXML
     private void initialize() {
         // 로그인 화면임을 표시
-        isLoginScreen = true;
+        super.isLoginScreen = true;
 
         // 스타일 적용
         applyStyles();
@@ -106,10 +107,11 @@ public class LoginController extends BaseController {
         String password = passwordField.getText().trim();
 
         // 이메일과 비밀번호 유효성 검사
-        if (email.isEmpty() || password.isEmpty()) {
-            showAlert(Alert.AlertType.ERROR, "로그인 오류", "이메일과 비밀번호를 모두 입력해주세요.");
-            return;
-        }
+        // TODO 테스트를 위한 임시주석
+//        if (email.isEmpty() || password.isEmpty()) {
+//            showAlert(Alert.AlertType.ERROR, "로그인 오류", "이메일과 비밀번호를 모두 입력해주세요.");
+//            return;
+//        }
 
         // 로그인 로직 수행
         boolean loginSuccess = performLogin(email, password);
@@ -117,6 +119,7 @@ public class LoginController extends BaseController {
         if (loginSuccess) {
             // 로그인 성공 시 제품 선택 화면으로 이동
             loadProductSelectScreen();
+
         } else {
             showAlert(Alert.AlertType.ERROR, "로그인 실패", "이메일 또는 비밀번호가 올바르지 않습니다.");
         }
@@ -160,12 +163,12 @@ public class LoginController extends BaseController {
     private void loadProductSelectScreen() {
         try {
             // 클래스 로더를 사용하여 확실한 리소스 경로 지정
-            String fxmlPath = "fxml/ProductSelect.fxml";
+            String fxmlPath = FxmlFileConstants.PRODUCT_SELECT_FXML;
             FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource(fxmlPath));
 
             if (loader.getLocation() == null) {
                 // 경로를 찾을 수 없는 경우 다른 방법으로 시도
-                loader = new FXMLLoader(getClass().getResource("/fxml/ProductSelect.fxml"));
+                loader = new FXMLLoader(getClass().getResource("/".concat(fxmlPath)));
 
                 if (loader.getLocation() == null) {
                     throw new IOException("ProductSelect.fxml 파일을 찾을 수 없습니다.");
