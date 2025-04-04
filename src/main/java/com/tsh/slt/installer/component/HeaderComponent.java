@@ -143,8 +143,8 @@ public class HeaderComponent {
                             "-fx-padding: 5px 10px;" +
                             "-fx-alignment: center-left;" +
                             "-fx-spacing: 10px;" +
-                            "-fx-pref-height: 30px;" +
-                            "-fx-max-height: 30px;"
+                            "-fx-pref-height: 50px;" +
+                            "-fx-max-height: 50px;"
             );
 
             // 이미지뷰 스타일 설정

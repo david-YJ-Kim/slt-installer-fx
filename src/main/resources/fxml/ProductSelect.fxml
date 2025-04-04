@@ -9,18 +9,20 @@
             fx:controller="com.tsh.slt.installer.controller.ProductSelectController"
             prefHeight="500.0" prefWidth="600.0">
 
-    <VBox alignment="CENTER" spacing="40.0" AnchorPane.topAnchor="0.0"
+    <VBox fx:id="mainContainer" alignment="CENTER" spacing="40.0" AnchorPane.topAnchor="0.0"
           AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
           AnchorPane.rightAnchor="0.0">
-        <!-- 패딩 값 조정 - 상단(top) 값을 늘림 -->
-        <padding>
-            <Insets top="60" right="20" bottom="20" left="20" />
-        </padding>
 
         <Label fx:id="titleLabel" text="Please Select Your Product" />
 
         <!-- 환경 선택 콤보박스 -->
         <ComboBox fx:id="environmentComboBox" />
+
+        <!-- 다운로드 진행 상황 표시 (처음에는 숨김) -->
+        <VBox spacing="10.0" alignment="CENTER">
+            <Label fx:id="downloadStatusLabel" text="다운로드 중..." visible="false" />
+            <ProgressBar fx:id="downloadProgressBar" progress="0.0" visible="false" prefWidth="400.0" />
+        </VBox>
 
         <!-- 빈 공간 추가 -->
         <Region VBox.vgrow="ALWAYS" />
