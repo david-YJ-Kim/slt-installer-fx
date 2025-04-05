@@ -9,22 +9,18 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.cloud.StorageClient;
 import com.tsh.slt.installer.util.FilePathUtil;
-import enums.DownloadFileTypes;
+import com.tsh.slt.installer.enums.DownloadFileTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -46,17 +42,20 @@ public class FirebaseStorageService {
         System.setProperty("jdk.tls.client.protocols", "TLSv1.2");
 
 
-        service.downloadFile(FilePathUtil.getFirebaseFilePath(DownloadFileTypes.jar)
-                , FilePathUtil.getLocalDownloadFilePath(DownloadFileTypes.jar, true));
+//        service.downloadFile(FilePathUtil.getFirebaseFilePath(DownloadFileTypes.jar)
+//                , FilePathUtil.getLocalDownloadFilePath(DownloadFileTypes.jar, true));
+//
+//        service.downloadFile(FilePathUtil.getFirebaseFilePath(DownloadFileTypes.yml)
+//                , FilePathUtil.getLocalDownloadFilePath(DownloadFileTypes.yml, true));
+//
+//        service.downloadFile(FilePathUtil.getFirebaseFilePath(DownloadFileTypes.jdk)
+//                , FilePathUtil.getLocalDownloadFilePath(DownloadFileTypes.jdk, true));
+//
+//        service.downloadFile(FilePathUtil.getFirebaseFilePath(DownloadFileTypes.vbs)
+//                , FilePathUtil.getLocalDownloadFilePath(DownloadFileTypes.vbs, true));
 
-        service.downloadFile(FilePathUtil.getFirebaseFilePath(DownloadFileTypes.yml)
-                , FilePathUtil.getLocalDownloadFilePath(DownloadFileTypes.yml, true));
-
-        service.downloadFile(FilePathUtil.getFirebaseFilePath(DownloadFileTypes.jdk)
-                , FilePathUtil.getLocalDownloadFilePath(DownloadFileTypes.jdk, true));
-
-        service.downloadFile(FilePathUtil.getFirebaseFilePath(DownloadFileTypes.vbs)
-                , FilePathUtil.getLocalDownloadFilePath(DownloadFileTypes.vbs, true));
+//        service.downloadFile(FilePathUtil.getFirebaseFilePath(DownloadFileTypes.bat)
+//                , FilePathUtil.getLocalDownloadFilePath(DownloadFileTypes.bat, true));
 
     }
 

@@ -1,7 +1,11 @@
 package com.tsh.slt.installer;
 
 import com.tsh.slt.installer.bizService.FirebaseStorageService;
+import com.tsh.slt.installer.bizService.FirebaseStoreService;
 import com.tsh.slt.installer.code.desings.ScreenSize;
+import com.tsh.slt.installer.enums.DownloadFileTypes;
+import com.tsh.slt.installer.util.FilePathUtil;
+import com.tsh.slt.installer.vo.ServiceDeployInfoDto;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -10,6 +14,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 
 
 public class Main extends Application {
@@ -38,9 +43,11 @@ public class Main extends Application {
     /**
      * 애플리케이션 진입점
      */
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
         // Firebase 초기화 코드가 필요하면 여기에 추가
          initializeFirebase();
+
+         testFirebase();
 
         // JavaFX 애플리케이션 시작
         launch(args);
@@ -60,5 +67,34 @@ public class Main extends Application {
         System.setProperty("jdk.tls.client.protocols", "TLSv1.2");
 
 
+
+
+    }
+
+
+    private static void testFirebase() throws Exception {
+        FirebaseStoreService store = FirebaseStoreService.getInstance();
+        FirebaseStorageService storage = FirebaseStorageService.getInstance();
+
+
+        ServiceDeployInfoDto dto = store.getLatestVersion();
+
+        storage.downloadFile(FilePathUtil.getFirebaseFilePath(DownloadFileTypes.jar, dto.getVersion())
+                , FilePathUtil.getLocalDownloadFilePath(DownloadFileTypes.jar, true, dto.getVersion()));
+
+        storage.downloadFile(FilePathUtil.getFirebaseFilePath(DownloadFileTypes.yml, dto.getVersion())
+                , FilePathUtil.getLocalDownloadFilePath(DownloadFileTypes.yml, true, dto.getVersion()));
+
+        storage.downloadFile(FilePathUtil.getFirebaseFilePath(DownloadFileTypes.jdk, dto.getVersion())
+                , FilePathUtil.getLocalDownloadFilePath(DownloadFileTypes.jdk, true, dto.getVersion()));
+
+        storage.downloadFile(FilePathUtil.getFirebaseFilePath(DownloadFileTypes.vbs, dto.getVersion())
+                , FilePathUtil.getLocalDownloadFilePath(DownloadFileTypes.vbs, true, dto.getVersion()));
+
+        storage.downloadFile(FilePathUtil.getFirebaseFilePath(DownloadFileTypes.runBat, dto.getVersion())
+                , FilePathUtil.getLocalDownloadFilePath(DownloadFileTypes.runBat, true, dto.getVersion()));
+
+        storage.downloadFile(FilePathUtil.getFirebaseFilePath(DownloadFileTypes.addBat, dto.getVersion())
+                , FilePathUtil.getLocalDownloadFilePath(DownloadFileTypes.addBat, true, dto.getVersion()));
     }
 }

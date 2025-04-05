@@ -1,7 +1,8 @@
 package com.tsh.slt.installer.util;
 
 
-import enums.DownloadFileTypes;
+import com.tsh.slt.installer.enums.DownloadFileTypes;
+import com.tsh.slt.installer.enums.SrvDeployFileName;
 
 import java.io.File;
 
@@ -10,25 +11,26 @@ import java.io.File;
  */
 public class FilePathUtil {
 
-    public static void main(String[] args) {
-
-        String result = FilePathUtil.getFirebaseFilePath(DownloadFileTypes.jdk);
-        System.out.println(result);
-    }
-
 
     static final String serviceDirName = "sellter-service";
     static final String userHomeProperty = "user.home";
 
 
-    public static String getLocalServiceDirPath(boolean isWindow) throws Exception {
+
+    /**
+     * 서비스 루트 폴더 생성 및 경로 리턴
+     * @param isWindow
+     * @return
+     * @throws Exception
+     */
+    public static String getServiceRootPath(boolean isWindow, String version) throws Exception {
 
         String serviceBasePath = "";
 
         if(isWindow){
 
             String localAppData = FilePathUtil.getLocalAppDataPath();
-            serviceBasePath = localAppData + File.separator + serviceDirName;
+            serviceBasePath = localAppData + File.separator + serviceDirName + File.separator + version;
 
         }
 
@@ -40,6 +42,26 @@ public class FilePathUtil {
         return serviceBasePath;
     }
 
+
+    /**
+     * 서비스 배포를 위한 기초 폴더 생성
+     * @param isWindow
+     * @throws Exception
+     */
+    public static void createServiceDeployDir(boolean isWindow, String version) throws Exception {
+
+        String srvRootPath = FilePathUtil.getServiceRootPath(isWindow, version);
+
+        // values() 메서드를 사용하여 모든 enum 상수 배열 가져오기
+        SrvDeployFileName[] values = SrvDeployFileName.values();
+
+
+        for (SrvDeployFileName folder : SrvDeployFileName.values()) {
+            String filePath = srvRootPath + File.separator + folder.name();
+            FilePathUtil.createDirectoryIfNotExists(filePath);
+        }
+
+    }
 
     /**
      * 윈도우 PC 전용, AppData\Local 경로 획득
@@ -54,19 +76,22 @@ public class FilePathUtil {
     }
 
 
+
     /**
      * 다운로드 파일 타입별 firebase 경로 획득
      * @param type
      * @return
      */
-    public static String getFirebaseFilePath(DownloadFileTypes type){
+    public static String getFirebaseFilePath(DownloadFileTypes type, String version){
 
         String jarFileName = "stl.agent-0.0.1-SNAPSHOT.jar";
         String ymlFileName = "application.yml";
         String jdkZipFileName = "java-1.8.0-openjdk-1.8.0.332-1.b09.ojdkbuild.windows.x86_64.zip";
         String vbsFileName = "run_vbs.vbs";
+        String runBatFileName = "sample_run.txt";
+        String addBatFileName = "addStartProgream.txt";
 
-        String basePath = "installer/agent/deploy/";
+        String basePath = "installer/agent/deploy/" + version + "/";
 
         switch (type){
             case jar:
@@ -77,6 +102,10 @@ public class FilePathUtil {
                 return basePath + "jdk/" + jdkZipFileName;
             case vbs:
                 return basePath + "scripts/win/" + vbsFileName;
+            case runBat:
+                return basePath + "scripts/win/" + runBatFileName;
+            case addBat:
+                return basePath + "scripts/win/" + addBatFileName;
             default:
                 throw new IllegalArgumentException();
         }
@@ -89,14 +118,16 @@ public class FilePathUtil {
      * @param type
      * @return
      */
-    public static String getLocalDownloadFilePath(DownloadFileTypes type, boolean isWindow) throws Exception {
+    public static String getLocalDownloadFilePath(DownloadFileTypes type, boolean isWindow, String version) throws Exception {
 
         String jarFileName = "stl.agent-0.0.1-SNAPSHOT.jar";
         String ymlFileName = "application.yml";
         String jdkZipFileName = "java-1.8.0-openjdk-1.8.0.332-1.b09.ojdkbuild.windows.x86_64.zip";
         String vbsFileName = "run_vbs.vbs";
+        String runBatFileName = "sample_run.bat";
+        String addBatFileName = "addStartProgream.bat";
 
-        String basePath = FilePathUtil.getLocalServiceDirPath(isWindow);
+        String basePath = FilePathUtil.getServiceRootPath(isWindow, version);
         String binPath = basePath + File.separator + "bin";
 
         switch (type){
@@ -120,6 +151,15 @@ public class FilePathUtil {
             case vbs:
                 if(!FilePathUtil.createDirectoryIfNotExists(binPath)) throw new Exception("Conf File not created.");
                 return binPath  + File.separator + vbsFileName;
+
+            case runBat:
+                if(!FilePathUtil.createDirectoryIfNotExists(binPath)) throw new Exception("Conf File not created.");
+                return binPath  + File.separator + runBatFileName;
+
+            case addBat:
+                if(!FilePathUtil.createDirectoryIfNotExists(binPath)) throw new Exception("Conf File not created.");
+                return binPath  + File.separator + addBatFileName;
+
             default:
                 throw new IllegalArgumentException();
         }
@@ -156,6 +196,11 @@ public class FilePathUtil {
         }
 
         return created;
+    }
+
+
+    public static void createDeployDirectory(){
+
     }
     
     
