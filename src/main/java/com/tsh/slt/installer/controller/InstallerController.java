@@ -136,6 +136,10 @@ public class InstallerController extends BaseController {
         return System.getProperty("user.home") + File.separator + "AppData" + File.separator + "Local" + File.separator + "DemoApp";
     }
 
+
+    /**
+     * 설치 프로세스 시작
+     */
     private void startInstallation() {
         // 설치 파일이 없는 경우 오류 표시
         if (installerFile == null) {
@@ -178,13 +182,6 @@ public class InstallerController extends BaseController {
                     Thread.sleep(500);
                 }
 
-                // 바로가기 생성
-                if (createShortcutCheckbox.isSelected()) {
-                    updateStatus("바탕 화면 바로가기 생성 중...");
-                    updateProgress(0.9);
-                    Thread.sleep(500);
-                    // 실제로는 여기서 바로가기 생성 코드가 들어갑니다
-                }
 
                 // 완료
                 updateProgress(1.0);
