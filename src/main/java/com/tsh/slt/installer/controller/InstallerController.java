@@ -151,6 +151,9 @@ public class InstallerController extends BaseController {
         installButton.setDisable(true);
         progressBar.setVisible(true);
 
+        // 기본 정보 조회
+        // 설치 조건 조회
+
         // 설치 프로세스 시뮬레이션
         Thread installThread = new Thread(() -> {
             try {
@@ -204,11 +207,11 @@ public class InstallerController extends BaseController {
         installThread.start();
     }
 
-    private void updateProgress(double progress) {
+    public void updateProgress(double progress) {
         javafx.application.Platform.runLater(() -> progressBar.setProgress(progress));
     }
 
-    private void updateStatus(String message) {
+    public void updateStatus(String message) {
         javafx.application.Platform.runLater(() -> statusLabel.setText(message));
     }
 

@@ -12,6 +12,7 @@ import lombok.ToString;
 @ToString
 public class ServiceDeployInfoDto {
 
+    String collectionName;                  // DB Collection 이름
     String id;
     String siteId;
     private String version;

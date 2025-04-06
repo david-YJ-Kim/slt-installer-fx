@@ -47,8 +47,6 @@ public class Main extends Application {
         // Firebase 초기화 코드가 필요하면 여기에 추가
          initializeFirebase();
 
-         testFirebase();
-
         // JavaFX 애플리케이션 시작
         launch(args);
     }
@@ -72,29 +70,4 @@ public class Main extends Application {
     }
 
 
-    private static void testFirebase() throws Exception {
-        FirebaseStoreService store = FirebaseStoreService.getInstance();
-        FirebaseStorageService storage = FirebaseStorageService.getInstance();
-
-
-        ServiceDeployInfoDto dto = store.getLatestVersion();
-
-        storage.downloadFile(FilePathUtil.getFirebaseFilePath(DownloadFileTypes.jar, dto.getVersion())
-                , FilePathUtil.getLocalDownloadFilePath(DownloadFileTypes.jar, true, dto.getVersion()));
-
-        storage.downloadFile(FilePathUtil.getFirebaseFilePath(DownloadFileTypes.yml, dto.getVersion())
-                , FilePathUtil.getLocalDownloadFilePath(DownloadFileTypes.yml, true, dto.getVersion()));
-
-        storage.downloadFile(FilePathUtil.getFirebaseFilePath(DownloadFileTypes.jdk, dto.getVersion())
-                , FilePathUtil.getLocalDownloadFilePath(DownloadFileTypes.jdk, true, dto.getVersion()));
-
-        storage.downloadFile(FilePathUtil.getFirebaseFilePath(DownloadFileTypes.vbs, dto.getVersion())
-                , FilePathUtil.getLocalDownloadFilePath(DownloadFileTypes.vbs, true, dto.getVersion()));
-
-        storage.downloadFile(FilePathUtil.getFirebaseFilePath(DownloadFileTypes.runBat, dto.getVersion())
-                , FilePathUtil.getLocalDownloadFilePath(DownloadFileTypes.runBat, true, dto.getVersion()));
-
-        storage.downloadFile(FilePathUtil.getFirebaseFilePath(DownloadFileTypes.addBat, dto.getVersion())
-                , FilePathUtil.getLocalDownloadFilePath(DownloadFileTypes.addBat, true, dto.getVersion()));
-    }
 }
