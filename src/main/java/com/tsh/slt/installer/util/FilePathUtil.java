@@ -2,10 +2,12 @@ package com.tsh.slt.installer.util;
 
 
 import com.tsh.slt.installer.enums.DownloadFileTypes;
-import com.tsh.slt.installer.enums.SrvCommonFileName;
-import com.tsh.slt.installer.enums.SrvCommonUtilFileName;
+import com.tsh.slt.installer.enums.CompanyCommonFileName;
+import com.tsh.slt.installer.enums.CompanyCommonUtilFileName;
 import com.tsh.slt.installer.enums.SrvDeployFileName;
 import com.tsh.slt.installer.vo.ServiceDeployInfoDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 
@@ -13,6 +15,8 @@ import java.io.File;
  * 파일 경로와 관련된 공통 유틸리티 함수 모음
  */
 public class FilePathUtil {
+
+    private final static Logger log = LoggerFactory.getLogger(FilePathUtil.class);
 
 
     static final String serviceDirName = "sellter-service";
@@ -26,10 +30,11 @@ public class FilePathUtil {
      * @return
      * @throws Exception
      */
-    public static boolean createCommonDir(boolean isWindow) throws Exception {
+    @Deprecated
+    public static boolean createCommonDir(boolean isWindow, String serviceName) throws Exception {
 
-        String rootPath = FilePathUtil.getServiceRootPath(isWindow);
-        return FilePathUtil.createDirectories(rootPath, SrvCommonFileName.class);
+        String rootPath = FilePathUtil.getServiceRootPath(isWindow, serviceName);
+        return FilePathUtil.createDirectories(rootPath, CompanyCommonFileName.class);
     }
 
     /**
@@ -39,16 +44,17 @@ public class FilePathUtil {
      * @return AppData/Local/serviceNm/util
      * @throws Exception
      */
-    public static String createUtilCommonDir(boolean isWindow) throws Exception {
+    @Deprecated
+    public static String createUtilCommonDir(boolean isWindow, String serviceName) throws Exception {
 
-        String rootPath = FilePathUtil.getServiceRootPath(isWindow) + File.separator + SrvCommonFileName.util;
+        String rootPath = FilePathUtil.getServiceRootPath(isWindow, serviceName) + File.separator + CompanyCommonFileName.util;
         File directory = new File(rootPath);
 
         if(!directory.exists()) {
-            FilePathUtil.createCommonDir(true);
+            FilePathUtil.createCommonDir(true, serviceName);
         }
 
-        boolean result = FilePathUtil.createDirectories(rootPath, SrvCommonUtilFileName.class);
+        boolean result = FilePathUtil.createDirectories(rootPath, CompanyCommonUtilFileName.class);
         if(!result) throw new Exception("Fail to create file");
 
         return rootPath;
@@ -62,13 +68,14 @@ public class FilePathUtil {
      * @return 생성된 Path 리턴 (AppData/Local/serviceNm/logs/v.1.0.0)
      * @throws Exception
      */
+    @Deprecated
     public static String createLogsDir(boolean isWindow, ServiceDeployInfoDto dto) throws Exception {
 
-        String rootPath = FilePathUtil.getServiceRootPath(isWindow) + File.separator + SrvCommonFileName.logs;
+        String rootPath = FilePathUtil.getServiceRootPath(isWindow, "serviceName") + File.separator + CompanyCommonFileName.logs;
         File directory = new File(rootPath);
 
         if(!directory.exists()) {
-            FilePathUtil.createCommonDir(true);
+            FilePathUtil.createCommonDir(true, "serviceName");
         }
 
         String createdPath = rootPath + File.separator + dto.getProdId() + File.separator + dto.getVersion();
@@ -80,28 +87,6 @@ public class FilePathUtil {
     }
 
 
-    /**
-     * Product에 필요한 폴더를 생성
-     * @param isWindow
-     * @return 생성된 Path 리턴 (AppData/Local/serviceNm/product/agent/v1.0.0)
-     * @throws Exception
-     */
-    public static String createProductDir(boolean isWindow, ServiceDeployInfoDto dto) throws Exception {
-
-        String rootPath = FilePathUtil.getServiceRootPath(isWindow) + File.separator + SrvCommonFileName.product;
-        File directory = new File(rootPath);
-
-        if(!directory.exists()) {
-            FilePathUtil.createCommonDir(true);
-        }
-
-        String createdPath = rootPath + File.separator + dto.getProdId() + File.separator + dto.getVersion();
-
-        boolean result = FilePathUtil.createDirectories(createdPath, SrvDeployFileName.class);
-        if(!result) throw new Exception("Fail to create file");
-
-        return createdPath;
-    }
 
 
 
@@ -202,14 +187,14 @@ public class FilePathUtil {
      * @return          ~/AppData/Local/serviceNm
      * @throws Exception
      */
-    private static String getServiceRootPath(boolean isWindow) throws Exception {
+    private static String getServiceRootPath(boolean isWindow, String serviceName) throws Exception {
 
         String serviceBasePath = "";
 
         if(isWindow){
 
             String localAppData = FilePathUtil.getLocalAppDataPath();
-            serviceBasePath = localAppData + File.separator + serviceDirName;
+            serviceBasePath = localAppData + File.separator + serviceName;
 
         }
 
@@ -227,7 +212,7 @@ public class FilePathUtil {
      * @param enumType 폴더명이 정의된 enum 클래스
      * @throws Exception 폴더 생성 실패 시 발생
      */
-    private static <T extends Enum<T>> boolean createDirectories(String rootPath, Class<T> enumType) {
+    public static <T extends Enum<T>> boolean createDirectories(String rootPath, Class<T> enumType) {
         // enum의 모든 상수 가져오기
         T[] enumConstants = enumType.getEnumConstants();
 
@@ -244,13 +229,14 @@ public class FilePathUtil {
         return true;
     }
 
+
     /**
      * 지정된 경로에 폴더가 없는 경우 폴더를 생성합니다.
      *
      * @param directoryPath 생성할 폴더 경로
      * @return 폴더 생성 성공 여부 (이미 존재하는 경우에도 true 반환)
      */
-    private static boolean createDirectoryIfNotExists(String directoryPath) {
+    public static boolean createDirectoryIfNotExists(String directoryPath) {
         File directory = new File(directoryPath);
 
         // 이미 폴더가 존재하는 경우
@@ -259,7 +245,7 @@ public class FilePathUtil {
             if (directory.isDirectory()) {
                 return true;
             } else {
-                System.err.println("경로가 이미 파일로 존재합니다: " + directoryPath);
+                log.error("path:{}. files are already existed.", directoryPath);
                 return false;
             }
         }
@@ -268,9 +254,9 @@ public class FilePathUtil {
         boolean created = directory.mkdirs();
 
         if (created) {
-            System.out.println("폴더 생성 완료: " + directoryPath);
+            log.info("path:{}. file are created.", directoryPath);
         } else {
-            System.err.println("폴더 생성 실패: " + directoryPath);
+            log.error("path:{}. fail to create file.", directoryPath);
         }
 
         return created;
@@ -282,7 +268,7 @@ public class FilePathUtil {
      * 윈도우 PC 전용, AppData\Local 경로 획득
      * @return C:\Users\tspsc\AppData\Local
      */
-    private static String getLocalAppDataPath(){
+    public static String getLocalAppDataPath(){
 
         String userHome = System.getProperty(userHomeProperty);
         return userHome + "\\AppData\\Local";

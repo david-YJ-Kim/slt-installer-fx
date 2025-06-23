@@ -1,10 +1,13 @@
 package com.tsh.slt.installer.bizService;
 
 import com.tsh.slt.installer.controller.InstallerController;
+import com.tsh.slt.installer.enums.COMPANY_NAME;
 import com.tsh.slt.installer.enums.DownloadFileTypes;
+import com.tsh.slt.installer.enums.PcEnvTypes;
 import com.tsh.slt.installer.util.FilePathUtil;
 import com.tsh.slt.installer.util.ServicePortFindUtil;
 import com.tsh.slt.installer.vo.InstallPreActionResultVo;
+import com.tsh.slt.installer.vo.ServiceDeployInfoDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,7 +20,7 @@ public class InstallProcessBizService {
     static int portRangeEnd = 15100;            // 가용 포트 범위 끝
     static int portNum = 2;                     // 필요한 포트 개수
 
-    public static Logger logger = LoggerFactory.getLogger(InstallProcessBizService.class);
+    public static Logger log = LoggerFactory.getLogger(InstallProcessBizService.class);
 
     private static InstallProcessBizService instance;
 
@@ -56,29 +59,42 @@ public class InstallProcessBizService {
      * @param controller
      * @return
      */
-    public boolean executeInstallLogic(InstallerController controller, InstallPreActionResultVo vo){
+    public boolean executeInstallLogic(InstallerController controller, InstallPreActionResultVo vo) throws Exception {
+
+        // TODO PC 환경 정보 가져오기
+        PcEnvTypes pcEnvTypes = PcEnvTypes.WINDOW;
 
         FirebaseStorageService storage = FirebaseStorageService.getInstance();
         FirebaseStoreService store = FirebaseStoreService.getInstance();
 
-        String installVersion = vo.getDeployInfo().getVersion();
+        ServiceDeployInfoDto serviceInstallInfo = vo.getDeployInfo();
+        String serviceName = serviceInstallInfo.getProdId();
+        String serviceVersion = serviceInstallInfo.getVersion();
 
 
         controller.updateProgress(0.0);
         controller.updateStatus("Start Installing.");
 
-        String logBaseDir; String productBaseDir; String utilBaseDir;
+        String logBaseDir; String productBaseDir = ""; String utilBaseDir = "";
 
         // 1. 서비스 폴더 생성
-        try {
-            FilePathUtil.createCommonDir(true);     // AppData/Local/serviceNm/ product & util & logs & storage
-            utilBaseDir = FilePathUtil.createUtilCommonDir(true); // AppData/Local/serviceNm/util/ script & jdk
-            logBaseDir = FilePathUtil.createLogsDir(true, vo.getDeployInfo());   // AppData/Local/serviceNm/logs/agent/v1.0.0
-            productBaseDir = FilePathUtil.createProductDir(true, vo.getDeployInfo()); // AppData/Local/serviceNm/product/agent/v1.0.0
+        FolderGenerateBizService folderGenerateBizService =
+                new FolderGenerateBizService(COMPANY_NAME.COMPANY_NAME, serviceName, serviceVersion, pcEnvTypes);
 
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        try{
+            folderGenerateBizService.generateCommonFolders();
+            log.info("complete generate folders under company.");
+            folderGenerateBizService.generateCommonUtilFolders();
+            log.info("complete generate util folders under common.");
+
+            folderGenerateBizService.generateServiceFolders();
+            log.info("complete generate service folder.");
+
+        }catch (Exception e){
+            log.error("error while generate folders.");
         }
+        log.info("complete process to generate folders. update status.");
+
         controller.updateProgress(1.0);
         controller.updateStatus("Compete create folder.");
 
@@ -87,8 +103,8 @@ public class InstallProcessBizService {
         for(DownloadFileTypes file : DownloadFileTypes.values()){
 
             try {
-                storage.downloadFile(FilePathUtil.getFirebaseFilePath(file, installVersion)
-                        , FilePathUtil.getLocalDownloadFilePath(productBaseDir, utilBaseDir, file, true, installVersion));
+                storage.downloadFile(FilePathUtil.getFirebaseFilePath(file, serviceVersion)
+                        , FilePathUtil.getLocalDownloadFilePath(productBaseDir, utilBaseDir, file, true, serviceVersion));
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
