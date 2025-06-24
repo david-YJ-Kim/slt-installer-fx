@@ -62,6 +62,25 @@ public class FolderGenerateBizService {
     }
 
 
+    public String getCompanyUtilPath(){
+
+        if(this.companyCommonUtilFolderPath.isEmpty()){
+            this.setCompanyUtilPath();
+        }
+
+        return this.companyCommonUtilFolderPath;
+    }
+
+    public String getServicePath(){
+
+        if(this.serviceExclusiveFolderPath.isEmpty()){
+            this.setServicePath();
+        }
+
+        return this.serviceExclusiveFolderPath;
+    }
+
+
     public boolean generateCommonFolders() throws Exception {
 
         if(companyRootFolderPath.isEmpty()){

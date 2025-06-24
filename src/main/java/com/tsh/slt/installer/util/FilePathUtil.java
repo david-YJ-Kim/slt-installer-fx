@@ -276,6 +276,233 @@ public class FilePathUtil {
 
     }
 
+    /**
+     * 해당 경로에 해당 파일명이 존재하는지 확인
+     */
+    public static boolean checkFileExisted(String filePath, String fileName) {
+        try {
+            // 입력 파라미터 유효성 검증
+            if (!areAllStringsValid(filePath, fileName)) {
+                return false;
+            }
+            
+            // 파일 경로 생성 및 존재 여부 확인
+            Path fullPath = Paths.get(filePath, fileName);
+            return Files.exists(fullPath) && Files.isRegularFile(fullPath);
+            
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * 해당 경로에 요청받은 파일 타입과 동일한 파일이 있는지 확인 (jar, bat 등)
+     */
+    public static boolean checkFileTypeExisted(String filePath, String fileType) {
+        try {
+            // 입력 파라미터 유효성 검증
+            if (!areAllStringsValid(filePath, fileType)) {
+                return false;
+            }
+            
+            // 디렉토리 유효성 검증
+            if (!isValidDirectory(filePath)) {
+                return false;
+            }
+            
+            // 파일타입 정리
+            String cleanedFileType = cleanFileType(fileType);
+            
+            // 디렉토리 내 파일 검색
+            File directory = new File(filePath);
+            File[] files = directory.listFiles();
+            
+            if (files == null) {
+                return false;
+            }
+            
+            // 각 파일의 확장자 확인
+            for (File file : files) {
+                if (file.isFile()) {
+                    String extension = getFileExtension(file.getName());
+                    if (!isNullOrEmpty(extension) && extension.equalsIgnoreCase(cleanedFileType)) {
+                        return true;
+                    }
+                }
+            }
+            
+            return false;
+            
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * 문자열이 null이거나 빈 문자열인지 확인하는 공통 메소드
+     */
+    private static boolean isNullOrEmpty(String str) {
+        return str == null || str.trim().isEmpty();
+    }
+
+    /**
+     * 여러 문자열이 모두 유효한지 확인하는 공통 메소드
+     */
+    private static boolean areAllStringsValid(String... strings) {
+        for (String str : strings) {
+            if (isNullOrEmpty(str)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * 디렉토리가 존재하고 유효한지 확인하는 공통 메소드
+     */
+    private static boolean isValidDirectory(String directoryPath) {
+        try {
+            File directory = new File(directoryPath);
+            return directory.exists() && directory.isDirectory();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * 파일 확장자를 추출하는 공통 메소드
+     */
+    private static String getFileExtension(String fileName) {
+        if (isNullOrEmpty(fileName)) {
+            return "";
+        }
+        
+        int lastDotIndex = fileName.lastIndexOf('.');
+        if (lastDotIndex > 0 && lastDotIndex < fileName.length() - 1) {
+            return fileName.substring(lastDotIndex + 1);
+        }
+        return "";
+    }
+
+    /**
+     * 파일 타입에서 점(.) 제거하는 공통 메소드
+     */
+    private static String cleanFileType(String fileType) {
+        if (isNullOrEmpty(fileType)) {
+            return "";
+        }
+        return fileType.startsWith(".") ? fileType.substring(1) : fileType;
+    }
+
+    /**
+     * 해당 경로에 해당 파일명이 존재하는지 확인
+     */
+    public static boolean checkFileExisted(String filePath, String fileName) {
+        try {
+            // 입력 파라미터 유효성 검증
+            if (!areAllStringsValid(filePath, fileName)) {
+                return false;
+            }
+            
+            // 파일 경로 생성 및 존재 여부 확인
+            Path fullPath = Paths.get(filePath, fileName);
+            return Files.exists(fullPath) && Files.isRegularFile(fullPath);
+            
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+
+    /**
+     * 디렉토리를 재귀적으로 삭제하는 공통 메소드 (파일과 하위 디렉토리 모두 삭제)
+     */
+    private static boolean deleteRecursively(File file) {
+        if (file == null || !file.exists()) {
+            return true;
+        }
+        
+        // 디렉토리인 경우 하위 파일/디렉토리를 먼저 삭제
+        if (file.isDirectory()) {
+            File[] children = file.listFiles();
+            if (children != null) {
+                for (File child : children) {
+                    if (!deleteRecursively(child)) {
+                        return false;
+                    }
+                }
+            }
+        }
+        
+        // 파일 또는 빈 디렉토리 삭제
+        return file.delete();
+    }
+
+
+    /**
+     * 요청받은 경로 하위에 있는 파일들 전부 삭제하는 메소드
+     * @param directoryPath 삭제할 파일들이 있는 디렉토리 경로
+     * @param deleteDirectory 디렉토리 자체도 삭제할지 여부 (true: 디렉토리도 삭제, false: 내용만 삭제)
+     * @return 삭제 성공 여부
+     */
+    public static boolean deleteAllFilesInDirectory(String directoryPath, boolean deleteDirectory) {
+        try {
+            // 입력 파라미터 유효성 검증
+            if (!areAllStringsValid(directoryPath)) {
+                return false;
+            }
+            
+            // 디렉토리 유효성 검증
+            if (!isValidDirectory(directoryPath)) {
+                return false;
+            }
+            
+            File directory = new File(directoryPath);
+            File[] files = directory.listFiles();
+            
+            // 파일 목록이 null인 경우 (권한 문제 등)
+            if (files == null) {
+                return false;
+            }
+            
+            // 하위 파일/디렉토리 삭제
+            boolean allDeleted = true;
+            for (File file : files) {
+                if (!deleteRecursively(file)) {
+                    allDeleted = false;
+                }
+            }
+            
+            // 디렉토리 자체도 삭제하는 경우
+            if (deleteDirectory && allDeleted) {
+                return directory.delete();
+            }
+            
+            return allDeleted;
+            
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * 요청받은 경로 하위에 있는 파일들만 삭제하는 메소드 (디렉토리는 유지)
+     * @param directoryPath 삭제할 파일들이 있는 디렉토리 경로
+     * @return 삭제 성공 여부
+     */
+    public static boolean deleteAllFilesOnly(String directoryPath) {
+        return deleteAllFilesInDirectory(directoryPath, false);
+    }
+
+
+    /**
+     * 요청받은 경로와 하위 모든 내용을 삭제하는 메소드 (디렉토리 포함)
+     * @param directoryPath 삭제할 디렉토리 경로
+     * @return 삭제 성공 여부
+     */
+    public static boolean deleteDirectoryCompletely(String directoryPath) {
+        return deleteAllFilesInDirectory(directoryPath, true);
+    }
     
     
 }

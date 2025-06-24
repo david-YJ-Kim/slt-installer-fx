@@ -98,8 +98,15 @@ public class InstallProcessBizService {
         controller.updateProgress(1.0);
         controller.updateStatus("Compete create folder.");
 
+        // Folder Generate 하면서 확인된 주요 경로 획득
+        String companyCommonUtilPath = folderGenerateBizService.getCompanyUtilPath();
+        String servicePath = folderGenerateBizService.getServicePath();
+
 
         // 2. Storage 에서 필요한 파일 다운로드
+        FileDownloadBizService fileDownloadBizService = new FileDownloadBizService(
+                                                        storage, companyCommonUtilPath, servicePath);
+        
         for(DownloadFileTypes file : DownloadFileTypes.values()){
 
             try {
@@ -140,4 +147,5 @@ public class InstallProcessBizService {
     
         
     }
+
 }
