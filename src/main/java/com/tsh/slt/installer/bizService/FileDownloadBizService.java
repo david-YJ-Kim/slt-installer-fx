@@ -8,13 +8,16 @@ import com.tsh.slt.installer.vo.*;
 import com.tsh.slt.installer.enums.*;
 
 import java.io.File;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class FileDownloadBizService {
 
     public static final Logger log = LoggerFactory.getLogger(FileDownloadBizService.class);
 
     FirebaseStorageService storageService;
-    ConcurrentHashMap<LocalDownloadedType, ArrayList<FileDownloadInfoVo>> downloadInfoMapByType;
+    OverallFileDownloadInfoVo overallFileDownloadInfoVo;
+
     private String companyCommonUtilFolderPath;
     private String companyCommonUtilScriptFolderPath;
     private String companyCommonUtilJdkFolderPath;
@@ -26,13 +29,11 @@ public class FileDownloadBizService {
     private String serviceTargetFolderPath;
 
 
-    public FileDownloadBizService(
-        FirebaseStorageService storageService, OverallFileDownloadInfoVo){
+    public FileDownloadBizService(FirebaseStorageService storageService, OverallFileDownloadInfoVo overallFileDownloadInfoVo){
 
         this.storageService = storageService;
-        this.downloadInfoMapByType = downloadInfoMapByType;
+        this.overallFileDownloadInfoVo = overallFileDownloadInfoVo;
 
-        this.initializeFolderPath();
         log.info("complete initialize all paths.");
 
     }
@@ -41,11 +42,11 @@ public class FileDownloadBizService {
 
     public boolean handleCommonUtilDownload(boolean isForce){
 
-        log.info("start download common-util files.(jdk / storage)")
+        log.info("start download common-util files.(jdk / storage)");
 
         boolean isAlreadyInstalled = this.checkCommonUtilAlreadyInstalled();
         if(isAlreadyInstalled){
-            log.info("common-util files already installed. skip download")
+            log.info("common-util files already installed. skip download");
             return true;
 
         }
@@ -56,20 +57,20 @@ public class FileDownloadBizService {
 
     public boolean handleServiceDownload(){
 
-        log.info("start download service files(bin / conf / target).")
+        log.info("start download service files(bin / conf / target).");
 
 
-        log.info("detect same version folder istalled.")
+        log.info("detect same version folder istalled.");
         boolean isSameVersionInstalled = false; // TODO generate code here.
         if(isSameVersionInstalled){
-            log.info("same version existed. delete this and install.")
+            log.info("same version existed. delete this and install.");
             
             // TODO delete same version of folder.
 
-            log.info("complete delete same version folder.")
+            log.info("complete delete same version folder.");
         }
 
-        log.info("start install service files.")
+        log.info("start install service files.");
         
 
         return true;
@@ -82,7 +83,7 @@ public class FileDownloadBizService {
 
     private boolean checkCommonUtilAlreadyInstalled(){
 
-        log.info("start check common-util files already installed ")
+        log.info("start check common-util files already installed ");
 
         return true;
     }

@@ -1,10 +1,12 @@
 package com.tsh.slt.installer.bizService;
 
 
+import com.tsh.slt.installer.enums.COMPANY_NAME;
 import com.tsh.slt.installer.enums.CompanyCommonFileName;
 import com.tsh.slt.installer.enums.CompanyCommonUtilFileName;
 import com.tsh.slt.installer.enums.PcEnvTypes;
 import com.tsh.slt.installer.util.FilePathUtil;
+import com.tsh.slt.installer.vo.MainFilePathVo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +39,6 @@ public class FolderGenerateBizService {
 
     private final static Logger log = LoggerFactory.getLogger(FolderGenerateBizService.class);
 
-    public String COMPANY_NAME;
     public String SERVICE_NAME;
     public String SERVICE_VERSION;
     public PcEnvTypes pcEnvTypes;
@@ -47,9 +48,8 @@ public class FolderGenerateBizService {
     private String serviceExclusiveFolderPath;
 
 
-    public FolderGenerateBizService(String companyName, String serviceName, String serviceVersion, PcEnvTypes pcEnvTypes) throws Exception {
+    public FolderGenerateBizService(String serviceName, String serviceVersion, PcEnvTypes pcEnvTypes) throws Exception {
 
-        this.COMPANY_NAME = companyName;
         this.SERVICE_NAME = serviceName;
         this.SERVICE_VERSION = serviceVersion;
         this.pcEnvTypes = pcEnvTypes;
@@ -59,6 +59,29 @@ public class FolderGenerateBizService {
 
         this.generateFolder(this.companyRootFolderPath);
         log.info("generate root files. finish initialize.");
+    }
+
+    public MainFilePathVo generateFolder(){
+        try{
+            this.generateCommonFolders();
+            log.info("complete generate folders under company.");
+            this.generateCommonUtilFolders();
+            log.info("complete generate util folders under common.");
+
+            this.generateServiceFolders();
+            log.info("complete generate service folder.");
+
+        }catch (Exception e){
+            log.error("error while generate folders.");
+            throw new RuntimeException("e");
+        }
+
+        return MainFilePathVo.builder()
+                        .companyCommonUtilPath(this.getCompanyUtilPath())
+                        .servicePath(this.getServicePath()).build();
+
+
+
     }
 
 
@@ -172,7 +195,7 @@ public class FolderGenerateBizService {
     }
 
     private void setCompanyRootPath(){
-        this.companyRootFolderPath = FilePathUtil.getLocalAppDataPath() + File.separator + COMPANY_NAME;
+        this.companyRootFolderPath = FilePathUtil.getLocalAppDataPath() + File.separator + COMPANY_NAME.COMPANY_NAME;
         log.info("get serviceRootPath:{}.", this.companyRootFolderPath);
 
     }

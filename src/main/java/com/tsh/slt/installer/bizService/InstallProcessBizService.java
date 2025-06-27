@@ -7,6 +7,8 @@ import com.tsh.slt.installer.enums.PcEnvTypes;
 import com.tsh.slt.installer.util.FilePathUtil;
 import com.tsh.slt.installer.util.ServicePortFindUtil;
 import com.tsh.slt.installer.vo.InstallPreActionResultVo;
+import com.tsh.slt.installer.vo.MainFilePathVo;
+import com.tsh.slt.installer.vo.OverallFileDownloadInfoVo;
 import com.tsh.slt.installer.vo.ServiceDeployInfoDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,9 +18,9 @@ import java.util.concurrent.ExecutionException;
 
 public class InstallProcessBizService {
 
-    static int portRangeStart = 15000;          // 가용 포트 범위 시작
-    static int portRangeEnd = 15100;            // 가용 포트 범위 끝
-    static int portNum = 2;                     // 필요한 포트 개수
+    static int DEFAULT_PORT_RANGE_START = 15000;          // 가용 포트 범위 시작
+    static int DEFAULT_PORT_RANGE_END = 15100;            // 가용 포트 범위 끝
+    static int DEFAULT_PORT_NUM = 2;                     // 필요한 포트 개수
 
     public static Logger log = LoggerFactory.getLogger(InstallProcessBizService.class);
 
@@ -62,7 +64,7 @@ public class InstallProcessBizService {
     public boolean executeInstallLogic(InstallerController controller, InstallPreActionResultVo vo) throws Exception {
 
 
-        this.updateInstallProgress(controller, 0.0, "start installing.")
+        this.updateInstallProgress(controller, 0.0, "start installing.");
         
         // TODO PC 환경 정보 가져오기
         PcEnvTypes pcEnvTypes = PcEnvTypes.WINDOW;
@@ -73,43 +75,32 @@ public class InstallProcessBizService {
         ServiceDeployInfoDto serviceInstallInfo = vo.getDeployInfo();
         String serviceName = serviceInstallInfo.getProdId();
         String serviceVersion = serviceInstallInfo.getVersion();
-        
-        
-        
+
+        @Deprecated
         String logBaseDir; String productBaseDir = ""; String utilBaseDir = "";
-        
-        this.updateInstallProgress(controller, 1.0, "generate some folders.")
-        FolderGenerateBizService folderGenerateBizService =
-        new FolderGenerateBizService(COMPANY_NAME.COMPANY_NAME, serviceName, serviceVersion, pcEnvTypes);
-        
-        try{
-            folderGenerateBizService.generateCommonFolders();
-            log.info("complete generate folders under company.");
-            folderGenerateBizService.generateCommonUtilFolders();
-            log.info("complete generate util folders under common.");
-            
-            folderGenerateBizService.generateServiceFolders();
-            log.info("complete generate service folder.");
-            
-        }catch (Exception e){
-            log.error("error while generate folders.");
-        }
+
+
+
+        this.updateInstallProgress(controller, 1.0, "generate some folders.");
+        FolderGenerateBizService folderGenerateBizService = new FolderGenerateBizService(serviceName, serviceVersion, pcEnvTypes);
+        MainFilePathVo mainFilePathVo = folderGenerateBizService.generateFolder();
         log.info("complete process to generate folders. update status.");
         
         
         // Folder Generate 하면서 확인된 주요 경로 획득
-        String companyCommonUtilPath = folderGenerateBizService.getCompanyUtilPath();
-        String servicePath = folderGenerateBizService.getServicePath();
+        String companyCommonUtilPath = mainFilePathVo.getCompanyCommonUtilPath();
+        String servicePath = mainFilePathVo.getServicePath();
         
         
-        this.updateInstallProgress(controller, 2.0, "generate install info.")
-        InstallFilePathGetter filePathGetter = new InstallFilePathGetter(
-                                    COMPANY_NAME.COMPANY_NAME, serviceName, serviceVersion, serviceInstallInfo);
+        this.updateInstallProgress(controller, 2.0, "generate install info.");
+        InstallFilePathGetter filePathGetter = new InstallFilePathGetter(serviceName,
+                                                serviceVersion, companyCommonUtilPath, servicePath, serviceInstallInfo);
+
         OverallFileDownloadInfoVo downloadInfoMapByType = filePathGetter.generateFileDownloadInfoVo();
         
 
-        this.updateInstallProgress(controller, 3.0, "install some files from storage.")
-        FileDownloadBizService fileDownloadBizService = new FileDownloadBizService(storage, OverallFileDownloadInfoVo);
+        this.updateInstallProgress(controller, 3.0, "install some files from storage.");
+        FileDownloadBizService fileDownloadBizService = new FileDownloadBizService(storage, downloadInfoMapByType);
         
         for(DownloadFileTypes file : DownloadFileTypes.values()){
             
@@ -122,25 +113,17 @@ public class InstallProcessBizService {
         }
         
         
-        this.updateInstallProgress(controller, 4.0, "searching for available service port.")
-        List<Integer> availableServicePorts = ServicePortFindUtil.findAvailablePorts(portRangeStart, portRangeEnd, portNum);
-        controller.updateProgress(3.0);
-        controller.updateStatus("Compete getting service port.");
-        
-        // 4. 포트 정보 등록
-        try {
-            store.updateTicketPortInfo(vo.getUserInfo(), availableServicePorts);
-        } catch (ExecutionException e) {
-            throw new RuntimeException(e);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        
-        this.updateInstallProgress(controller, 5.0, "generate runnign scripts.")
-        this.updateInstallProgress(controller, 6.0, "set-up running enviroment.")
-        this.updateInstallProgress(controller, 7.0, "start running your agent.")
-        this.updateInstallProgress(controller, 9.0, "start running satelite.")
-        this.updateInstallProgress(controller, 10.0, "complete install enjoy.")
+        this.updateInstallProgress(controller, 4.0, "searching for available service port.");
+        List<Integer> availableServicePorts = this.getAvailableServicePorts(serviceInstallInfo);
+
+
+        this.updateInstallProgress(controller, 6.0, "set-up service port.");
+        store.updateTicketPortInfo(vo.getUserInfo(), availableServicePorts);
+
+        this.updateInstallProgress(controller, 7.0, "set-up running enviroment.");
+        this.updateInstallProgress(controller, 8.0, "start running your agent.");
+        this.updateInstallProgress(controller, 9.0, "start running satelite.");
+        this.updateInstallProgress(controller, 10.0, "complete install enjoy.");
 
         return true;
 
@@ -157,4 +140,28 @@ public class InstallProcessBizService {
 
 
 
+    private List<Integer> getAvailableServicePorts(ServiceDeployInfoDto serviceDeployInfoDto) {
+
+        int portRngStr = serviceDeployInfoDto.getPortRngStrt() == null
+                                        ? DEFAULT_PORT_RANGE_START
+                                        : serviceDeployInfoDto.getPortRngStrt().intValue();
+        int portRngEnd = serviceDeployInfoDto.getPortRngEnd() == null
+                                        ? DEFAULT_PORT_RANGE_END
+                                        : serviceDeployInfoDto.getPortRngEnd().intValue();
+        int portNum = serviceDeployInfoDto.getPortNum() == null
+                                        ? DEFAULT_PORT_NUM
+                                        : serviceDeployInfoDto.getPortNum().intValue();
+
+        List<Integer> availableServicePorts = ServicePortFindUtil.findAvailablePorts
+                (portRngStr, portRngEnd, portNum);
+        if(availableServicePorts.size() != portNum){
+            log.error("sizeOfList:{}, portNum:{} unmatched. return only portNum", availableServicePorts.size(), portNum);
+            availableServicePorts =  availableServicePorts.subList(0, portNum);
+
+        }
+        log.info("available port list:{}.", availableServicePorts);
+
+        return availableServicePorts;
+
+    }
 }

@@ -1,5 +1,19 @@
 package com.tsh.slt.installer.bizService;
 
+import com.tsh.slt.installer.enums.COMPANY_NAME;
+import com.tsh.slt.installer.enums.CompanyCommonUtilFileName;
+import com.tsh.slt.installer.enums.LocalDownloadedType;
+import com.tsh.slt.installer.enums.SrvDeployFileName;
+import com.tsh.slt.installer.vo.FileDownloadInfoVo;
+import com.tsh.slt.installer.vo.OverallFileDownloadInfoVo;
+import com.tsh.slt.installer.vo.ServiceDeployInfoDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+
 public class InstallFilePathGetter {
 
     static final Logger log = LoggerFactory.getLogger(InstallFilePathGetter.class);
@@ -23,11 +37,11 @@ public class InstallFilePathGetter {
     private ConcurrentHashMap<LocalDownloadedType, ArrayList<FileDownloadInfoVo>> downloadInfoMapByType;
 
 
-    public InstallFilePathGetter(String companyName, String serviceName, String version, String companyCommonUtilFolderPath, String serviceFolderPath,
+    public InstallFilePathGetter(String serviceName, String version, String companyCommonUtilFolderPath, String serviceFolderPath,
                                     ServiceDeployInfoDto serviceDeployInfo) {
 
-        log.info("initialize class.")
-        this.companyName = companyName;
+        log.info("initialize class.");
+        this.companyName = COMPANY_NAME.COMPANY_NAME;
         this.serviceName = serviceName;
         this.version = version;
         this.companyCommonUtilFolderPath = companyCommonUtilFolderPath;
@@ -37,7 +51,7 @@ public class InstallFilePathGetter {
         this.initializeFolderPath();
 
         this.initializeDowloadMapInfo();
-        log.info("complete initialize class.")
+        log.info("complete initialize class.");
     }
 
     private void initializeFolderPath(){
@@ -66,29 +80,31 @@ public class InstallFilePathGetter {
 
     public OverallFileDownloadInfoVo generateFileDownloadInfoVo(){
 
-        log.info("request to generate files download info.")
+        log.info("request to generate files download info.");
 
         this.downloadInfoMapByType.put(LocalDownloadedType.CompanyUtil, this.generateCommonUtilDownloadInfoVo());
         this.downloadInfoMapByType.put(LocalDownloadedType.Service, this.generateServiceDownloadInfoVo());
 
-        log.info("complete generate files download info.")
+        log.info("complete generate files download info.");
 
-        OverallFileDownloadInfoVo result = OverallFileDownloadInfoVo().builder().build();
+        OverallFileDownloadInfoVo result = OverallFileDownloadInfoVo.builder().build();
 
         return result;
     }
 
     private ArrayList<FileDownloadInfoVo> generateCommonUtilDownloadInfoVo(){
 
-        log.info("request to generate commont-util files download info.")
+        log.info("request to generate commont-util files download info.");
+
+        return null;
     }
 
     private ArrayList<FileDownloadInfoVo> generateServiceDownloadInfoVo(){
 
-        log.info("request to generate service files download info. (jar/conf/vbs/bats)")
+        log.info("request to generate service files download info. (jar/conf/vbs/bats)");
 
-        ServiceDeployInfoDto serviceDeployInfo = this.dataAccess.getLatestVersion();
 
+        return null;
 
     }
 }

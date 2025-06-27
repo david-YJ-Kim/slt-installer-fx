@@ -28,6 +28,10 @@ public class ServiceDeployInfoDto {
     private String winRunBatFileName;
     private String winVbsFileName;
 
+    private Long portRngStrt;
+    private Long portRngEnd;
+    private Long portNum;
+
     private Timestamp crtDt;
     private Timestamp updateDt;
 }

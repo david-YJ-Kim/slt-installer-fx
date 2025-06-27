@@ -5,6 +5,7 @@ import com.google.cloud.Timestamp;
 import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
 import com.tsh.slt.installer.enums.DeployInfoColumns;
+import com.tsh.slt.installer.enums.ServiceProductId;
 import com.tsh.slt.installer.enums.TicketInfoColumns;
 import com.tsh.slt.installer.util.StoreDataMappingUtil;
 import com.tsh.slt.installer.vo.ServiceDeployInfoDto;
@@ -72,7 +73,7 @@ public class FirebaseStoreService {
             return dto;
 
         } else {
-            log.error("Not found deploy info.")
+            log.error("Not found deploy info.");
             throw new RuntimeException();
         }
     }
@@ -119,7 +120,7 @@ public class FirebaseStoreService {
      * @throws ExecutionException
      * @throws InterruptedException
      */
-    public boolean updateTicketPortInfo(UserTicketInfoDto dto, List<Integer> portData) throws ExecutionException, InterruptedException {
+    public boolean updateTicketPortInfo(UserTicketInfoDto dto, List<Integer> portData) {
 
         if(portData == null || portData.size() != 2){
             System.err.println("Port data is not defined.");
@@ -148,8 +149,14 @@ public class FirebaseStoreService {
         });
 
         // 트랜잭션 결과 확인
-        String result = future.get();
-        System.out.println(result);
+        String result = null;
+        try {
+            result = future.get();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
+        }
         return true;
     }
 
