@@ -18,6 +18,16 @@ public class ServiceDeployInfoDto {
     private String version;
     private String prodDesc;
     private String prodId;
+    private String companyName;
+    
+    private String confFileName;
+    private String jarFileName;
+    private String jdkFileName;
+    private String storagePath;
+    private String winRunAddBatFileName;
+    private String winRunBatFileName;
+    private String winVbsFileName;
+
     private Timestamp crtDt;
     private Timestamp updateDt;
 }

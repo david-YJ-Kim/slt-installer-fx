@@ -21,7 +21,9 @@ public class FirebaseStoreService {
     static final String deployCollectionName = "deploy";
     static final String userCollectionName = "tickets";
 
-    static final Logger logger = LoggerFactory.getLogger(FirebaseStoreService.class);
+    static final String deployProdIdColName = "PROD_ID";
+
+    static final Logger log = LoggerFactory.getLogger(FirebaseStoreService.class);
 
     private static FirebaseStoreService instance;
 
@@ -43,6 +45,7 @@ public class FirebaseStoreService {
         // 생성자는 private으로 외부에서 직접 생성 불가
     }
 
+    // TODO method name change getLatestVersion → getLatestDeployInfo
     /**
      * 서비스 최신의 배포 버전 가져오기
      * @return
@@ -53,6 +56,7 @@ public class FirebaseStoreService {
 
         // 타임스탬프 필드를 기준으로 내림차순 정렬 후 첫 번째 문서만 가져오기
         Query query = db.collection(deployCollectionName)
+                .whereEqualTo(deployProdIdColName, ServiceProductId.agent.name())
                 .orderBy(DeployInfoColumns.UPDATE_DT.name(), Query.Direction.DESCENDING)
                 .limit(1);
 
@@ -63,17 +67,20 @@ public class FirebaseStoreService {
         if (!documents.isEmpty()) {
             DocumentSnapshot document = documents.get(0);
             ServiceDeployInfoDto dto = StoreDataMappingUtil.deployInfoMapping(deployCollectionName, document);
-            System.out.println(dto.toString());
+            
+            log.info(dto.toString());
             return dto;
 
         } else {
-            System.out.println("컬렉션에 문서가 없습니다.");
+            log.error("Not found deploy info.")
             throw new RuntimeException();
         }
     }
 
     /**
-     * 서비스 최신의 배포 버전 가져오기
+     * fetch user info by email
+     * @param userName
+     * @param email
      * @return
      * @throws ExecutionException
      * @throws InterruptedException

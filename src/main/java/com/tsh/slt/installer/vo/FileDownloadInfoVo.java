@@ -8,11 +8,13 @@ import lombok.Setter;
 @Setter
 public class FileDownloadInfoVo {
 
-    LocalDownloadedType localDownloadType; // CompanyUtil - Service
-    String fileName;
-    String fileType;
-    String fileNameIncludingType;
+    LocalDownloadedType localDownloadType; // CompanyUtil or Service
+    String fileNameInLocalPc;
+    String fileTypeInLocalPc;
+    String fileNameIncludingTypeInLocalPc;
+    String fileInstalledFolderPathInLocalPc;
 
     String targetLocalFolderPath;
+    String storageSavedFileName;
     String storageDownloadPath;
 }

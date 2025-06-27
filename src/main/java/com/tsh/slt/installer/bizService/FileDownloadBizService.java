@@ -14,9 +14,7 @@ public class FileDownloadBizService {
     public static final Logger log = LoggerFactory.getLogger(FileDownloadBizService.class);
 
     FirebaseStorageService storageService;
-
-    private ConcurrentHashMap<LocalDownloadedType, ArrayList<FileDownloadInfoVo>> downloadInfoMapByType;
-
+    ConcurrentHashMap<LocalDownloadedType, ArrayList<FileDownloadInfoVo>> downloadInfoMapByType;
     private String companyCommonUtilFolderPath;
     private String companyCommonUtilScriptFolderPath;
     private String companyCommonUtilJdkFolderPath;
@@ -27,60 +25,52 @@ public class FileDownloadBizService {
     private String serviceConfFolderPath;
     private String serviceTargetFolderPath;
 
-    // TODO make property and make is security.
-    private final String storageBaseUri = "installer/agent/deploy/";
 
     public FileDownloadBizService(
-        FirebaseStorageService storageService, String companyCommonUtilFolderPath, String serviceFolderPath){
+        FirebaseStorageService storageService, OverallFileDownloadInfoVo){
 
         this.storageService = storageService;
-        this.companyCommonUtilFolderPath = companyCommonUtilFolderPath;
-        this.serviceFolderPath = serviceFolderPath;
+        this.downloadInfoMapByType = downloadInfoMapByType;
 
         this.initializeFolderPath();
         log.info("complete initialize all paths.");
 
     }
 
-    private void initializeDowloadMapInfo(){
-
-        if(this.downloadInfoMapByType == null){
-            this.downloadInfoMapByType = new ConcurrentHashMap<>();
-        }
-
-        this.downloadInfoMapByType.put(LocalDownloadedType.jdk, new ArrayList)
-    }
-
-    private void initializeFolderPath(){
-
-        this.companyCommonUtilScriptFolderPath = this.companyCommonUtilFolderPath + File.separator
-                                                    + CompanyCommonUtilFileName.script.name();
-        this.companyCommonUtilJdkFolderPath = this.companyCommonUtilFolderPath + File.separator
-                                                    + CompanyCommonUtilFileName.jdk.name();
-        this.companyCommonUtilStorageFolderPath = this.companyCommonUtilFolderPath + File.separator
-                                                    + CompanyCommonUtilFileName.storage.name();
-
-        this.serviceBinFolderPath = this.serviceFolderPath + File.separator + SrvDeployFileName.bin.name();
-        this.serviceConfFolderPath = this.serviceFolderPath + File.separator + SrvDeployFileName.conf.name();
-        this.serviceTargetFolderPath = this.serviceFolderPath + File.separator + SrvDeployFileName.target.name();
-
-        log.info("complete initialize all paths.");
-    }
 
 
     public boolean handleCommonUtilDownload(boolean isForce){
 
         log.info("start download common-util files.(jdk / storage)")
 
-        this.checkCommonUtilAlreadyInstalled();
+        boolean isAlreadyInstalled = this.checkCommonUtilAlreadyInstalled();
+        if(isAlreadyInstalled){
+            log.info("common-util files already installed. skip download")
+            return true;
 
-        // check already installed files
+        }
 
         return true;
     }
 
 
     public boolean handleServiceDownload(){
+
+        log.info("start download service files(bin / conf / target).")
+
+
+        log.info("detect same version folder istalled.")
+        boolean isSameVersionInstalled = false; // TODO generate code here.
+        if(isSameVersionInstalled){
+            log.info("same version existed. delete this and install.")
+            
+            // TODO delete same version of folder.
+
+            log.info("complete delete same version folder.")
+        }
+
+        log.info("start install service files.")
+        
 
         return true;
     }
@@ -97,10 +87,7 @@ public class FileDownloadBizService {
         return true;
     }
 
-    private boolean checkServiceAlreadyInstalled(){
 
-        return true;
-    }
 
 
 }
