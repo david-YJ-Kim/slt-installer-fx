@@ -1,12 +1,12 @@
 package com.tsh.slt.installer.bizService;
 
-import com.tsh.slt.installer.enums.COMPANY_NAME;
-import com.tsh.slt.installer.enums.CompanyCommonUtilFileName;
-import com.tsh.slt.installer.enums.LocalDownloadedType;
-import com.tsh.slt.installer.enums.SrvDeployFileName;
+import com.tsh.slt.installer.enums.*;
+import com.tsh.slt.installer.util.FilePathUtil;
 import com.tsh.slt.installer.vo.FileDownloadInfoVo;
+import com.tsh.slt.installer.vo.MainFilePathVo;
 import com.tsh.slt.installer.vo.OverallFileDownloadInfoVo;
 import com.tsh.slt.installer.vo.ServiceDeployInfoDto;
+import org.checkerframework.checker.units.qual.A;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,28 +36,29 @@ public class InstallFilePathGetter {
 
     private ConcurrentHashMap<LocalDownloadedType, ArrayList<FileDownloadInfoVo>> downloadInfoMapByType;
 
+    static final String serverSeparator = "/";
 
-    public InstallFilePathGetter(String serviceName, String version, String companyCommonUtilFolderPath, String serviceFolderPath,
-                                    ServiceDeployInfoDto serviceDeployInfo) {
+
+    public InstallFilePathGetter(String serviceName, String version, MainFilePathVo mainFilePathVo,ServiceDeployInfoDto serviceDeployInfo) {
 
         log.info("initialize class.");
         this.companyName = COMPANY_NAME.COMPANY_NAME;
         this.serviceName = serviceName;
         this.version = version;
-        this.companyCommonUtilFolderPath = companyCommonUtilFolderPath;
-        this.serviceFolderPath = serviceFolderPath;
+        this.companyCommonUtilFolderPath = mainFilePathVo.getCompanyCommonUtilPath();
+        this.serviceFolderPath = mainFilePathVo.getServicePath();
         this.serviceDeployInfo = serviceDeployInfo;
 
         this.initializeFolderPath();
 
-        this.initializeDowloadMapInfo();
+        this.initializeDownloadMapInfo();
         log.info("complete initialize class.");
     }
 
     private void initializeFolderPath(){
 
         this.companyCommonUtilScriptFolderPath = this.companyCommonUtilFolderPath + File.separator
-                                                    + CompanyCommonUtilFileName.script.name();
+                                                    + CompanyCommonUtilFileName.scripts.name();
         this.companyCommonUtilJdkFolderPath = this.companyCommonUtilFolderPath + File.separator
                                                     + CompanyCommonUtilFileName.jdk.name();
         this.companyCommonUtilStorageFolderPath = this.companyCommonUtilFolderPath + File.separator
@@ -70,7 +71,7 @@ public class InstallFilePathGetter {
         log.info("complete initialize all paths.");
     }
 
-    private void initializeDowloadMapInfo(){
+    private void initializeDownloadMapInfo(){
 
         if(this.downloadInfoMapByType == null){
             this.downloadInfoMapByType = new ConcurrentHashMap<>();
@@ -82,29 +83,100 @@ public class InstallFilePathGetter {
 
         log.info("request to generate files download info.");
 
-        this.downloadInfoMapByType.put(LocalDownloadedType.CompanyUtil, this.generateCommonUtilDownloadInfoVo());
-        this.downloadInfoMapByType.put(LocalDownloadedType.Service, this.generateServiceDownloadInfoVo());
+        ArrayList<FileDownloadInfoVo> localFileAndStorageInfoForCommonUtil = this.generateCommonUtilDownloadInfoVo();
+        ArrayList<FileDownloadInfoVo> localFileAndStorageInfoForService = this.generateServiceDownloadInfoVo();
 
+
+        this.downloadInfoMapByType.put(LocalDownloadedType.CompanyUtil, localFileAndStorageInfoForCommonUtil);
+        this.downloadInfoMapByType.put(LocalDownloadedType.Service, localFileAndStorageInfoForService);
         log.info("complete generate files download info.");
 
-        OverallFileDownloadInfoVo result = OverallFileDownloadInfoVo.builder().build();
+        return this.generateOverallFileDownInfo();
 
-        return result;
     }
+
 
     private ArrayList<FileDownloadInfoVo> generateCommonUtilDownloadInfoVo(){
 
-        log.info("request to generate commont-util files download info.");
+        ArrayList<FileDownloadInfoVo> commonUtilArray = new ArrayList<>();
 
-        return null;
+        log.info("request to generate common-util files download info.");
+
+        log.info("generate commonUtil info. runbat script among (script(runBat/addBat/vbs) & jdk & storage)");
+        LocalDownloadedType downloadedType = LocalDownloadedType.CompanyUtil;
+        commonUtilArray.add(this.generateInfoVo(downloadedType, DownloadFileTypeAndName.runBat, serviceDeployInfo.getWinRunBatFileName()));
+        commonUtilArray.add(this.generateInfoVo(downloadedType, DownloadFileTypeAndName.addBat, serviceDeployInfo.getWinRunAddBatFileName()));
+        commonUtilArray.add(this.generateInfoVo(downloadedType, DownloadFileTypeAndName.vbs, serviceDeployInfo.getWinVbsFileName()));
+
+
+        commonUtilArray.add(this.generateInfoVo(downloadedType, DownloadFileTypeAndName.jdk, serviceDeployInfo.getJdkFileName()));
+        commonUtilArray.add(this.generateInfoVo(downloadedType, DownloadFileTypeAndName.data, serviceDeployInfo.getStorageFileName()));
+
+
+        return commonUtilArray;
     }
+
 
     private ArrayList<FileDownloadInfoVo> generateServiceDownloadInfoVo(){
 
-        log.info("request to generate service files download info. (jar/conf/vbs/bats)");
+        log.info("request to generate service files download info. (jar/conf)");
 
 
-        return null;
+        ArrayList<FileDownloadInfoVo> serviceArray = new ArrayList<>();
+
+
+        LocalDownloadedType downloadedType = LocalDownloadedType.Service;
+        serviceArray.add(this.generateInfoVo(downloadedType, DownloadFileTypeAndName.jar, serviceDeployInfo.getJarFileName()));
+        serviceArray.add(this.generateInfoVo(downloadedType, DownloadFileTypeAndName.yml, serviceDeployInfo.getConfFileName()));
+
+
+        return serviceArray;
+
+
+    }
+
+
+    private FileDownloadInfoVo generateInfoVo(LocalDownloadedType downloadedType, DownloadFileTypeAndName localFileNameAndType,
+                                                              String fullFileNameOnServer){
+
+
+        String[] pathAndFileNameAndExtensionOnServer = FilePathUtil.separatePathAndFileNameAndExtension(fullFileNameOnServer);
+
+        String fileName = localFileNameAndType.fileName.isEmpty() ? pathAndFileNameAndExtensionOnServer[1] : localFileNameAndType.fileName;
+        String fileType = localFileNameAndType.fileType.isEmpty() ? pathAndFileNameAndExtensionOnServer[2] : localFileNameAndType.fileType;
+        String fileNameAndType = FilePathUtil.attachedFileNameAndExtension(fileName, fileType);
+
+        return FileDownloadInfoVo.builder()
+                .localDownloadType(downloadedType).fileName(fileName).fileType(fileType).fileNameAndType(fileNameAndType)
+                .filePathIncludingTypeInLocalPc(this.companyCommonUtilScriptFolderPath + File.separator + fileNameAndType)
+                .storageSavedFileName(serviceDeployInfo.getWinRunBatFileName())
+                .storageDownloadPathIncludingName(serviceDeployInfo.getStoragePath() + serverSeparator + fullFileNameOnServer)
+                .build();
+
+
+    }
+
+
+
+
+
+
+
+
+
+    private OverallFileDownloadInfoVo generateOverallFileDownInfo(){
+
+        return OverallFileDownloadInfoVo.builder()
+                                            .companyName(this.companyName).serviceName(this.serviceName).version(this.version)
+                                            .companyCommonUtilFolderPath(this.companyCommonUtilFolderPath)
+                                            .companyCommonUtilScriptFolderPath(this.companyCommonUtilScriptFolderPath)
+                                            .companyCommonUtilJdkFolderPath(this.companyCommonUtilJdkFolderPath)
+                                            .serviceFolderPath(this.serviceFolderPath)
+                                            .serviceBinFolderPath(this.serviceBinFolderPath).serviceConfFolderPath(this.serviceConfFolderPath)
+                                            .serviceTargetFolderPath(this.serviceTargetFolderPath)
+                                            .downloadInfoMapByType(this.downloadInfoMapByType)
+                                            .build();
+
 
     }
 }

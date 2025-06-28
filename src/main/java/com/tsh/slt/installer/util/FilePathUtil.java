@@ -10,6 +10,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * 파일 경로와 관련된 공통 유틸리티 함수 모음
@@ -296,6 +299,26 @@ public class FilePathUtil {
     }
 
     /**
+     * 해당 폴더 경로가 존재하는지 확인
+     */
+    public static boolean checkFolderExisted(String folderPath) {
+        try {
+            // 입력 파라미터 유효성 검증
+            if (!areAllStringsValid(folderPath)) {
+                return false;
+            }
+
+            // 폴더 경로 생성 및 존재 여부 확인
+            Path path = Paths.get(folderPath);
+            return Files.exists(path) && Files.isDirectory(path);
+
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+
+    /**
      * 해당 경로에 요청받은 파일 타입과 동일한 파일이 있는지 확인 (jar, bat 등)
      */
     public static boolean checkFileTypeExisted(String filePath, String fileType) {
@@ -394,24 +417,6 @@ public class FilePathUtil {
         return fileType.startsWith(".") ? fileType.substring(1) : fileType;
     }
 
-    /**
-     * 해당 경로에 해당 파일명이 존재하는지 확인
-     */
-    public static boolean checkFileExisted(String filePath, String fileName) {
-        try {
-            // 입력 파라미터 유효성 검증
-            if (!areAllStringsValid(filePath, fileName)) {
-                return false;
-            }
-            
-            // 파일 경로 생성 및 존재 여부 확인
-            Path fullPath = Paths.get(filePath, fileName);
-            return Files.exists(fullPath) && Files.isRegularFile(fullPath);
-            
-        } catch (Exception e) {
-            return false;
-        }
-    }
 
 
     /**
@@ -503,6 +508,42 @@ public class FilePathUtil {
     public static boolean deleteDirectoryCompletely(String directoryPath) {
         return deleteAllFilesInDirectory(directoryPath, true);
     }
-    
-    
+
+
+    public static String[] detachedFileNameAndExtension(String fileAttachedExtension){
+
+        int lastDotIndex = fileAttachedExtension.lastIndexOf('.');
+
+        if (lastDotIndex != -1) {
+            String nameWithoutExtension = fileAttachedExtension.substring(0, lastDotIndex);
+            String extension = fileAttachedExtension.substring(lastDotIndex + 1);
+
+            return new String[]{nameWithoutExtension, extension};
+
+        } else {
+            throw new IllegalArgumentException("파일명에 확장자가 없습니다: " + fileAttachedExtension);
+        }
+    }
+
+    public static String[] separatePathAndFileNameAndExtension(String fullPath){
+
+        int lastSlashIndex = fullPath.lastIndexOf('/');
+        int lastDotIndex = fullPath.lastIndexOf('.');
+
+        if (lastSlashIndex != -1 && lastDotIndex != -1 && lastDotIndex > lastSlashIndex) {
+            String path = fullPath.substring(0, lastSlashIndex + 1); // "/" 포함
+            String nameWithoutExtension = fullPath.substring(lastSlashIndex + 1, lastDotIndex);
+            String extension = fullPath.substring(lastDotIndex); // "." 포함
+
+            return new String[]{path, nameWithoutExtension, extension};
+
+        } else {
+            throw new IllegalArgumentException("올바른 경로 형식이 아닙니다: " + fullPath);
+        }
+    }
+
+    public static String attachedFileNameAndExtension(String name, String extension){
+        return name + "." + extension;
+    }
+
 }

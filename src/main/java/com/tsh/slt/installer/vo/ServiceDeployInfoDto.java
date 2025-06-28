@@ -23,6 +23,7 @@ public class ServiceDeployInfoDto {
     private String confFileName;
     private String jarFileName;
     private String jdkFileName;
+    private String storageFileName;
     private String storagePath;
     private String winRunAddBatFileName;
     private String winRunBatFileName;

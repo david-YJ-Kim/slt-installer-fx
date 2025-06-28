@@ -120,7 +120,7 @@ public class FirebaseStoreService {
      * @throws ExecutionException
      * @throws InterruptedException
      */
-    public boolean updateTicketPortInfo(UserTicketInfoDto dto, List<Integer> portData) {
+    public boolean updateUserPortInfo(UserTicketInfoDto dto, List<Integer> portData) {
 
         if(portData == null || portData.size() != 2){
             System.err.println("Port data is not defined.");

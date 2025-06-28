@@ -1,20 +1,21 @@
 package com.tsh.slt.installer.vo;
 
 import com.tsh.slt.installer.enums.LocalDownloadedType;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
+@Builder
 public class FileDownloadInfoVo {
 
     LocalDownloadedType localDownloadType; // CompanyUtil or Service
-    String fileNameInLocalPc;
-    String fileTypeInLocalPc;
-    String fileNameIncludingTypeInLocalPc;
-    String fileInstalledFolderPathInLocalPc;
+    String fileName;
+    String fileType;
+    String fileNameAndType;
+    String filePathIncludingTypeInLocalPc;
 
-    String targetLocalFolderPath;
     String storageSavedFileName;
-    String storageDownloadPath;
+    String storageDownloadPathIncludingName;
 }

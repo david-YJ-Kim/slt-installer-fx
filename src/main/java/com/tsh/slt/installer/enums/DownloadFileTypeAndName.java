@@ -6,13 +6,13 @@ public enum DownloadFileTypeAndName {
     yml("application", "yml"),
     jdk("openjdk-1.8", "zip"),
     vbs("", "vbs"),
-    bat("", "bat"),
+    runBat("", "bat"),
     addBat("addStartProgram", "bat"),
     data("agent-init-data", "sql3") // TODO check data type
     ;
 
-    private final String fileName;
-    private final String fileType;
+    public final String fileName;
+    public final String fileType;
 
     DownloadFileTypeAndName(String fileName, String fileType){
         this.fileName = fileName;
