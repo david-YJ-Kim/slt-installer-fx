@@ -146,13 +146,25 @@ public class InstallFilePathGetter {
         String fileType = localFileNameAndType.fileType.isEmpty() ? pathAndFileNameAndExtensionOnServer[2] : localFileNameAndType.fileType;
         String fileNameAndType = FilePathUtil.attachedFileNameAndExtension(fileName, fileType);
 
-        return FileDownloadInfoVo.builder()
-                .localDownloadType(downloadedType).fileName(fileName).fileType(fileType).fileNameAndType(fileNameAndType)
-                .filePathIncludingTypeInLocalPc(this.companyCommonUtilScriptFolderPath + File.separator + fileNameAndType)
-                .storageSavedFileName(serviceDeployInfo.getWinRunBatFileName())
-                .storageDownloadPathIncludingName(serviceDeployInfo.getStoragePath() + serverSeparator + fullFileNameOnServer)
-                .build();
+        FileDownloadInfoVo result =  FileDownloadInfoVo.builder()
+                        .localDownloadType(downloadedType).fileName(fileName).fileType(fileType).fileNameAndType(fileNameAndType)
+                        .filePathIncludingTypeInLocalPc(this.companyCommonUtilScriptFolderPath + File.separator + fileNameAndType)
+                        .storageSavedFileName(serviceDeployInfo.getWinRunBatFileName())
+                        .storageDownloadPathIncludingName(serviceDeployInfo.getStoragePath() + serverSeparator + fullFileNameOnServer)
+                        .build();
 
+        if(downloadedType.equals(LocalDownloadedType.CompanyUtil)){
+            if(localFileNameAndType.equals(DownloadFileTypeAndName.addBat) ||
+                    localFileNameAndType.equals(DownloadFileTypeAndName.vbs)){
+
+                result.setRunScript(true);
+                log.info("Type:{}, file:{} set run-script:{}."
+                        , downloadedType.name(), localFileNameAndType.name(), result.isRunScript());
+
+            }
+        }
+
+        return result;
 
     }
 

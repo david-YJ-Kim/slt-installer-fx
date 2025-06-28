@@ -1,16 +1,18 @@
 package com.tsh.slt.installer.bizService;
 
 import com.tsh.slt.installer.controller.InstallerController;
+import com.tsh.slt.installer.enums.DownloadFileTypeAndName;
+import com.tsh.slt.installer.enums.LocalDownloadedType;
 import com.tsh.slt.installer.enums.PcEnvTypes;
 import com.tsh.slt.installer.util.ServicePortFindUtil;
-import com.tsh.slt.installer.vo.InstallPreActionResultVo;
-import com.tsh.slt.installer.vo.MainFilePathVo;
-import com.tsh.slt.installer.vo.OverallFileDownloadInfoVo;
-import com.tsh.slt.installer.vo.ServiceDeployInfoDto;
+import com.tsh.slt.installer.util.WinScriptExecutor;
+import com.tsh.slt.installer.vo.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class InstallProcessBizService {
 
@@ -98,19 +100,28 @@ public class InstallProcessBizService {
         this.updateInstallProgress(controller, 6.0, "set-up service port.");
         store.updateUserPortInfo(vo.getUserInfo(), availableServicePorts);
 
+
+
         this.updateInstallProgress(controller, 7.0, "set-up running environment.");
+        LocalDownloadedType type = LocalDownloadedType.CompanyUtil;
+        ArrayList<FileDownloadInfoVo> filteredArray = downloadInfoMapByType.getDownloadInfoMapByType().get(type).stream()
+                                                        .filter(FileDownloadInfoVo::isRunScript)
+                                                        .collect(Collectors.toCollection(ArrayList::new));
 
         this.updateInstallProgress(controller, 8.0, "start running your agent.");
+        WinScriptExecutor.executeBatFile(filteredArray.get(0).getFilePathIncludingTypeInLocalPc());
 
-        this.updateInstallProgress(controller, 9.0, "start running satellite.");
+
+        this.updateInstallProgress(controller, 9.0, "start running agent.");
+        WinScriptExecutor.executeBatFile(filteredArray.get(1).getFilePathIncludingTypeInLocalPc());
 
         this.updateInstallProgress(controller, 10.0, "complete install enjoy.");
+        log.info("complete install process.");
 
         return true;
-
-    
-        
     }
+
+
 
 
     private void updateInstallProgress(InstallerController controller, double progress, String status) {

@@ -1,5 +1,6 @@
 package com.tsh.slt.installer.vo;
 
+import com.tsh.slt.installer.enums.CompanyCommonUtilFileName;
 import com.tsh.slt.installer.enums.LocalDownloadedType;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,4 +19,6 @@ public class FileDownloadInfoVo {
 
     String storageSavedFileName;
     String storageDownloadPathIncludingName;
+
+    boolean isRunScript;
 }
