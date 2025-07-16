@@ -1,11 +1,13 @@
 package com.tsh.slt.installer.vo;
 
 import com.tsh.slt.installer.enums.BizWorkTypes;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
+@Builder
 public class InstallPreActionResultVo {
 
     public BizWorkTypes workTypes;                     // 수행할 Work 타입

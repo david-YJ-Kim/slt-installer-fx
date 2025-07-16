@@ -15,19 +15,23 @@ public class StoreDataMappingUtil {
 
     /**
      * Deploy 버전 dto mapping 메소드
+     *
      * @param collectionNm
      * @param document
      * @return
      */
-    public static ServiceDeployInfoDto deployInfoMapping(String collectionNm, DocumentSnapshot document){
+    public static ServiceDeployInfoDto deployInfoMapping(String collectionNm, DocumentSnapshot document) {
 
-        ServiceDeployInfoDto dto = new ServiceDeployInfoDto();
+        ServiceDeployInfoDto dto = ServiceDeployInfoDto.builder().build();
 
         // ID 설정
         dto.setCollectionName(collectionNm);
         dto.setId(document.getId());
 
         // 필드 매핑
+        if (document.contains(DeployInfoColumns.ID.name())) {
+            dto.setId(document.getString(DeployInfoColumns.ID.name()));
+        }
         if (document.contains(DeployInfoColumns.SITE_ID.name())) {
             dto.setSiteId(document.getString(DeployInfoColumns.SITE_ID.name()));
         }
@@ -46,6 +50,42 @@ public class StoreDataMappingUtil {
         if (document.contains(DeployInfoColumns.UPDATE_DT.name())) {
             dto.setUpdateDt(document.getTimestamp(DeployInfoColumns.UPDATE_DT.name()));
         }
+        if (document.contains(DeployInfoColumns.COMPANY_NAME.name())) {
+            dto.setCompanyName(document.getString(DeployInfoColumns.COMPANY_NAME.name()));
+        }
+        if (document.contains(DeployInfoColumns.CONF_FILE_NAME.name())) {
+            dto.setConfFileName(document.getString(DeployInfoColumns.CONF_FILE_NAME.name()));
+        }
+        if (document.contains(DeployInfoColumns.JAR_FILE_NAME.name())) {
+            dto.setJarFileName(document.getString(DeployInfoColumns.JAR_FILE_NAME.name()));
+        }
+        if (document.contains(DeployInfoColumns.JDK_FILE_NAME.name())) {
+            dto.setJdkFileName(document.getString(DeployInfoColumns.JDK_FILE_NAME.name()));
+        }
+        if (document.contains(DeployInfoColumns.PORT_NUM.name())) {
+            dto.setPortNum(document.getLong(DeployInfoColumns.PORT_NUM.name()));
+        }
+        if (document.contains(DeployInfoColumns.PORT_RNG_END.name())) {
+            dto.setPortRngEnd(document.getLong(DeployInfoColumns.PORT_RNG_END.name()));
+        }
+        if (document.contains(DeployInfoColumns.PORT_RNG_STRT.name())) {
+            dto.setPortRngStrt(document.getLong(DeployInfoColumns.PORT_RNG_STRT.name()));
+        }
+        if (document.contains(DeployInfoColumns.STORAGE_FILE_NAME.name())) {
+            dto.setStorageFileName(document.getString(DeployInfoColumns.STORAGE_FILE_NAME.name()));
+        }
+        if (document.contains(DeployInfoColumns.STORAGE_PATH.name())) {
+            dto.setStoragePath(document.getString(DeployInfoColumns.STORAGE_PATH.name()));
+        }
+        if (document.contains(DeployInfoColumns.WIN_RUN_ADD_BAT_FILE_NAME.name())) {
+            dto.setWinRunAddBatFileName(document.getString(DeployInfoColumns.WIN_RUN_ADD_BAT_FILE_NAME.name()));
+        }
+        if (document.contains(DeployInfoColumns.WIN_RUN_BAT_FILE_NAME.name())) {
+            dto.setWinRunBatFileName(document.getString(DeployInfoColumns.WIN_RUN_BAT_FILE_NAME.name()));
+        }
+        if (document.contains(DeployInfoColumns.WIN_VBS_FILE_NAME.name())) {
+            dto.setWinVbsFileName(document.getString(DeployInfoColumns.WIN_VBS_FILE_NAME.name()));
+        }
 
         return dto;
     }
@@ -53,13 +93,14 @@ public class StoreDataMappingUtil {
 
     /**
      * User tickets dto mapping 메소드
+     *
      * @param collectionNm
      * @param document
      * @return
      */
-    public static UserTicketInfoDto ticketMapping(String collectionNm, DocumentSnapshot document){
+    public static UserTicketInfoDto ticketMapping(String collectionNm, DocumentSnapshot document) {
 
-        UserTicketInfoDto dto = new UserTicketInfoDto();
+        UserTicketInfoDto dto = UserTicketInfoDto.builder().build();
 
         // ID 설정
         dto.setCollectionName(collectionNm);
@@ -87,7 +128,6 @@ public class StoreDataMappingUtil {
         if (document.contains(TicketInfoColumns.updatedAt.name())) {
             dto.setUpdatedAt(document.getTimestamp(TicketInfoColumns.updatedAt.name()));
         }
-
 
         if (document.contains(TicketInfoColumns.agentPort.name())) {
             dto.setAgentPort(document.getString(TicketInfoColumns.agentPort.name()));

@@ -3,6 +3,7 @@ package com.tsh.slt.installer.vo;
 import com.google.cloud.Timestamp;
 import com.google.cloud.firestore.annotation.DocumentId;
 import com.google.cloud.firestore.annotation.PropertyName;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -10,6 +11,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
+@Builder
 public class ServiceDeployInfoDto {
 
     String collectionName;                  // DB Collection 이름

@@ -7,33 +7,16 @@ import com.tsh.slt.installer.enums.CompanyCommonUtilFileName;
 import com.tsh.slt.installer.enums.PcEnvTypes;
 import com.tsh.slt.installer.util.FilePathUtil;
 import com.tsh.slt.installer.vo.MainFilePathVo;
+import java.io.File;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-
 /**
- * 	서비스 폴더 구조
- * 	폴더 구분
- * 	서비스 공통 폴더
- * 	서비스 전용 폴더
- *
- * 	기본 구조
- * → AppData/Local/${companyName}/${serviceName}
- * 	버전(version): 서비스 전용 폴더
- * → ${serviceName}/${version}
- * 	실행파일(bin)
- * 	설정파일(conf)
- * 	Jar파일(target)
- * 	공통(util) : 하위는 서비스 공통 폴더
- * → ${serviceName}/util
- * 	실행파일(bin)
- * 	자바파일(jdk)
- * 	로그(logs)
- * → ${serviceName}/logs
- * 
- * 	데이터(storage)
- * → ${serviceName}/storage
+ * 	서비스 폴더 구조 	폴더 구분 	서비스 공통 폴더 	서비스 전용 폴더
+ * <p>
+ * 	기본 구조 → AppData/Local/${companyName}/${serviceName} 	버전(version): 서비스 전용 폴더 → ${serviceName}/${version}
+ * 	실행파일(bin) 	설정파일(conf) 	Jar파일(target) 	공통(util) : 하위는 서비스 공통 폴더 → ${serviceName}/util 	실행파일(bin) 	자바파일(jdk)
+ * 	로그(logs) → ${serviceName}/logs  	데이터(storage) → ${serviceName}/storage
  */
 public class FolderGenerateBizService {
 
@@ -61,8 +44,8 @@ public class FolderGenerateBizService {
         log.info("generate root files. finish initialize.");
     }
 
-    public MainFilePathVo generateFolder(){
-        try{
+    public MainFilePathVo generateFolder() {
+        try {
             this.generateCommonFolders();
             log.info("complete generate folders under company.");
             this.generateCommonUtilFolders();
@@ -71,32 +54,31 @@ public class FolderGenerateBizService {
             this.generateServiceFolders();
             log.info("complete generate service folder.");
 
-        }catch (Exception e){
-            log.error("error while generate folders.");
+        } catch (Exception e) {
+            log.error("error while generate folders. e:{}", e);
             throw new RuntimeException("e");
         }
 
         return MainFilePathVo.builder()
-                        .companyCommonUtilPath(this.getCompanyUtilPath())
-                        .servicePath(this.getServicePath()).build();
-
+                .companyCommonUtilPath(this.getCompanyUtilPath())
+                .servicePath(this.getServicePath()).build();
 
 
     }
 
 
-    public String getCompanyUtilPath(){
+    public String getCompanyUtilPath() {
 
-        if(this.companyCommonUtilFolderPath.isEmpty()){
+        if (this.companyCommonUtilFolderPath.isEmpty()) {
             this.setCompanyUtilPath();
         }
 
         return this.companyCommonUtilFolderPath;
     }
 
-    public String getServicePath(){
+    public String getServicePath() {
 
-        if(this.serviceExclusiveFolderPath.isEmpty()){
+        if (this.serviceExclusiveFolderPath.isEmpty()) {
             this.setServicePath();
         }
 
@@ -106,17 +88,19 @@ public class FolderGenerateBizService {
 
     public boolean generateCommonFolders() throws Exception {
 
-        if(companyRootFolderPath.isEmpty()){
+        if (companyRootFolderPath.isEmpty()) {
             log.error("root path is empty.");
             this.setCompanyRootPath();
         }
 
-        boolean fileCreateResult = FilePathUtil.createDirectories(this.companyRootFolderPath, CompanyCommonFileName.class);
+        boolean fileCreateResult = FilePathUtil.createDirectories(this.companyRootFolderPath,
+                CompanyCommonFileName.class);
 
-
-        if(!fileCreateResult){
-            log.error("fail to create common folder (uitl, logs, storage) under companyRootFolder:{}.", this.companyRootFolderPath);
-            throw new Exception("fail to create common folder (uitl, logs, storage) under companyRootFolder:" + this.companyRootFolderPath + ".");
+        if (!fileCreateResult) {
+            log.error("fail to create common folder (uitl, logs, storage) under companyRootFolder:{}.",
+                    this.companyRootFolderPath);
+            throw new Exception("fail to create common folder (uitl, logs, storage) under companyRootFolder:"
+                    + this.companyRootFolderPath + ".");
         }
 
         log.info("created common folders (util, logs, storage) under({}).", this.companyRootFolderPath);
@@ -126,17 +110,19 @@ public class FolderGenerateBizService {
 
     public boolean generateCommonUtilFolders() throws Exception {
 
-        if(companyCommonUtilFolderPath.isEmpty()){
+        if (companyCommonUtilFolderPath.isEmpty()) {
             log.error("util path is empty.");
             this.setCompanyUtilPath();
         }
 
-        boolean fileCreateResult = FilePathUtil.createDirectories(this.companyCommonUtilFolderPath, CompanyCommonUtilFileName.class);
+        boolean fileCreateResult = FilePathUtil.createDirectories(this.companyCommonUtilFolderPath,
+                CompanyCommonUtilFileName.class);
 
-
-        if(!fileCreateResult){
-            log.error("fail to create common folder (script, jdk) under companyCommonFolder:{}.", this.companyCommonUtilFolderPath);
-            throw new Exception("fail to create common folder (script, jdk) under companyCommonFolder:" + this.companyCommonUtilFolderPath + ".");
+        if (!fileCreateResult) {
+            log.error("fail to create common folder (script, jdk) under companyCommonFolder:{}.",
+                    this.companyCommonUtilFolderPath);
+            throw new Exception("fail to create common folder (script, jdk) under companyCommonFolder:"
+                    + this.companyCommonUtilFolderPath + ".");
         }
 
         log.info("created common folders (script, jdk) under({}).", this.companyCommonUtilFolderPath);
@@ -146,15 +132,15 @@ public class FolderGenerateBizService {
 
     public boolean generateServiceFolders() throws Exception {
 
-        if(serviceExclusiveFolderPath.isEmpty()){
+        if (serviceExclusiveFolderPath.isEmpty()) {
             log.error("service path is empty.");
             this.setServicePath();
         }
 
-        boolean fileCreateResult = FilePathUtil.createDirectories(this.serviceExclusiveFolderPath, CompanyCommonUtilFileName.class);
+        boolean fileCreateResult = FilePathUtil.createDirectories(this.serviceExclusiveFolderPath,
+                CompanyCommonUtilFileName.class);
 
-
-        if(!fileCreateResult){
+        if (!fileCreateResult) {
             log.error("fail to create service folder (bin, conf, target, deploy) under serviceFolder:{}."
                     , this.serviceExclusiveFolderPath);
             throw new Exception("fail to service folder (bin, conf, target, deploy) under serviceFolder:"
@@ -166,16 +152,17 @@ public class FolderGenerateBizService {
     }
 
 
-
-    private void setCompanyUtilPath(){
-        this.companyCommonUtilFolderPath = this.companyRootFolderPath + File.separator + CompanyCommonFileName.util.name();
+    private void setCompanyUtilPath() {
+        this.companyCommonUtilFolderPath =
+                this.companyRootFolderPath + File.separator + CompanyCommonFileName.util.name();
         log.info("company common util path: {}.", this.companyCommonUtilFolderPath);
 
     }
 
-    private void setServicePath(){
+    private void setServicePath() {
 
-        this.serviceExclusiveFolderPath = this.companyRootFolderPath + File.separator + SERVICE_NAME + File.separator + SERVICE_VERSION;
+        this.serviceExclusiveFolderPath =
+                this.companyRootFolderPath + File.separator + SERVICE_NAME + File.separator + SERVICE_VERSION;
         log.info("service util path: {}.", this.serviceExclusiveFolderPath);
 
     }
@@ -185,7 +172,7 @@ public class FolderGenerateBizService {
         log.info("request to generate path:{}.", path);
         boolean fileCreateResult = FilePathUtil.createDirectoryIfNotExists(path);
 
-        if(!fileCreateResult){
+        if (!fileCreateResult) {
             log.error("fail to create folder w/ pat:{}.", path);
             throw new Exception("Fail to created file" + path + ".");
         }
@@ -194,9 +181,16 @@ public class FolderGenerateBizService {
 
     }
 
-    private void setCompanyRootPath(){
+    private void setCompanyRootPath() {
         this.companyRootFolderPath = FilePathUtil.getLocalAppDataPath() + File.separator + COMPANY_NAME.COMPANY_NAME;
         log.info("get serviceRootPath:{}.", this.companyRootFolderPath);
+
+        this.companyCommonUtilFolderPath = this.companyRootFolderPath + File.separator + CompanyCommonFileName.util;
+        log.info("generate util path under company.");
+
+        this.serviceExclusiveFolderPath =
+                this.companyRootFolderPath + File.separator + SERVICE_NAME + File.separator + SERVICE_VERSION;
+        log.info("generate service root path.");
 
     }
 

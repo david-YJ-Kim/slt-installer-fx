@@ -54,7 +54,7 @@ public class Main extends Application {
     /**
      * Firebase 초기화 메서드 (필요한 경우 구현)
      */
-    private static void initializeFirebase() throws IOException {
+    public static void initializeFirebase() throws IOException {
         // Firebase SDK 초기화 코드 (필요 시 구현)
 
         FirebaseStorageService service = FirebaseStorageService.getInstance();

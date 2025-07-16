@@ -2,7 +2,12 @@ package com.tsh.slt.installer.bizService;
 
 import com.google.api.core.ApiFuture;
 import com.google.cloud.Timestamp;
-import com.google.cloud.firestore.*;
+import com.google.cloud.firestore.DocumentReference;
+import com.google.cloud.firestore.DocumentSnapshot;
+import com.google.cloud.firestore.Firestore;
+import com.google.cloud.firestore.Query;
+import com.google.cloud.firestore.QueryDocumentSnapshot;
+import com.google.cloud.firestore.QuerySnapshot;
 import com.google.firebase.cloud.FirestoreClient;
 import com.tsh.slt.installer.enums.DeployInfoColumns;
 import com.tsh.slt.installer.enums.ServiceProductId;
@@ -10,12 +15,11 @@ import com.tsh.slt.installer.enums.TicketInfoColumns;
 import com.tsh.slt.installer.util.StoreDataMappingUtil;
 import com.tsh.slt.installer.vo.ServiceDeployInfoDto;
 import com.tsh.slt.installer.vo.UserTicketInfoDto;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.security.InvalidParameterException;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FirebaseStoreService {
 
@@ -36,7 +40,7 @@ public class FirebaseStoreService {
             instance = new FirebaseStoreService();
         }
 
-        if(instance.db == null){
+        if (instance.db == null) {
             instance.db = FirestoreClient.getFirestore();
         }
         return instance;
@@ -47,8 +51,10 @@ public class FirebaseStoreService {
     }
 
     // TODO method name change getLatestVersion → getLatestDeployInfo
+
     /**
      * 서비스 최신의 배포 버전 가져오기
+     *
      * @return
      * @throws ExecutionException
      * @throws InterruptedException
@@ -67,8 +73,9 @@ public class FirebaseStoreService {
 
         if (!documents.isEmpty()) {
             DocumentSnapshot document = documents.get(0);
-            ServiceDeployInfoDto dto = StoreDataMappingUtil.deployInfoMapping(deployCollectionName, document);
-            
+            ServiceDeployInfoDto dto = StoreDataMappingUtil.deployInfoMapping(deployCollectionName,
+                    document);
+
             log.info(dto.toString());
             return dto;
 
@@ -80,13 +87,15 @@ public class FirebaseStoreService {
 
     /**
      * fetch user info by email
+     *
      * @param userName
      * @param email
      * @return
      * @throws ExecutionException
      * @throws InterruptedException
      */
-    public UserTicketInfoDto getUserTickerInfo(String userName, String email) throws ExecutionException, InterruptedException {
+    public UserTicketInfoDto getUserTickerInfo(String userName, String email)
+            throws ExecutionException, InterruptedException {
 
         // 타임스탬프 필드를 기준으로 내림차순 정렬 후 첫 번째 문서만 가져오기
         Query query = db.collection(userCollectionName)
@@ -114,6 +123,7 @@ public class FirebaseStoreService {
 
     /**
      * User 정보에 가용할 포트 정보 업데이트
+     *
      * @param dto
      * @param portData
      * @return
@@ -122,7 +132,7 @@ public class FirebaseStoreService {
      */
     public boolean updateUserPortInfo(UserTicketInfoDto dto, List<Integer> portData) {
 
-        if(portData == null || portData.size() != 2){
+        if (portData == null || portData.size() != 2) {
             System.err.println("Port data is not defined.");
             throw new InvalidParameterException("Port data is missing");
         }
